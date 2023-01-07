@@ -1,0 +1,27 @@
+<configuration>
+
+    <property>
+        <name>yarn.resourcemanager.hostname</name>
+        <value>private ip of primary node</value>
+    </property>
+    <property>
+        <name>yarn.log-aggregation-enable</name>
+        <value>true</value>
+    </property>
+    <property>
+        <name>yarn.nodemanager.resource.cpu-vcores</name>
+        <value>36</value>
+    </property>
+        <property>
+        <name>yarn.scheduler.maximum-allocation-vcores</name>
+        <value>36</value>
+    </property>
+    <property>
+        <name>yarn.scheduler.maximum-allocation-mb</name>
+        <value>65536</value>
+    </property>
+    <property>
+        <name>yarn.nodemanager.resource.memory-mb</name>
+        <value>65536</value>
+    </property>
+</configuration>
