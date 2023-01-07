@@ -261,7 +261,7 @@ If `hdfs dfs -ls /` returns errors, restart HDFS.
 $HADOOP_HOME/sbin/start-dfs.sh
 ```
 
-####9\. Submit the benchmark job.
+#### 9\. Submit the benchmark job.
 
 Since you are now in the primary node of your Flintrock OSS Spark cluster, set `YOUR_S3_BUCKET` as an environment variable within this node as well.
 
