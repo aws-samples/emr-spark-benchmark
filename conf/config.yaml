@@ -1,0 +1,29 @@
+services:
+  spark:
+    version: 3.3.0
+    download-source: "https://archive.apache.org/dist/spark/spark-3.3.0/spark-3.3.0-bin-hadoop3.tgz"
+  hdfs:
+    version: 3.3.4
+    download-source: "https://archive.apache.org/dist/hadoop/core/hadoop-3.3.4/"
+provider: ec2
+providers:
+  ec2:
+    key-name: master2-us-east-1-ec2-key-pair
+    identity-file: /Users/srsekar/master2-us-east-1-ec2-key-pair.pem
+    instance-type: c5d.9xlarge
+    region: us-east-1
+    ami: ami-05fa00d4c63e32376
+    user: ec2-user
+    instance-profile-name: EMR_EC2_DefaultRole
+    min-root-ebs-size-gb: 20
+    tenancy: default  # default | dedicated
+    ebs-optimized: yes  # yes | no
+    instance-initiated-shutdown-behavior: terminate  # terminate | stop
+
+launch:
+  num-slaves: 6
+  install-hdfs: True
+  install-spark: True
+  java-version: 8
+
+debug: false
