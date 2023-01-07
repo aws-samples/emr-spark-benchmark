@@ -58,7 +58,7 @@ aws s3 sync s3://blogpost-sparkoneks-us-east-1/blog/BLOG_TPCDS-TEST-3T-partition
 ```
 9\. Build the benchmark application following the instructions provided in [Steps to build spark-benchmark-assembly application](build-instructions.md). For your convenience we have also provided a sample application jar file [spark-benchmark-assembly-3.3.0.jar](https://aws-bigdata-blog.s3.amazonaws.com/artifacts/oss-spark-benchmarking/spark-benchmark-assembly-3.3.0.jar) that we have built following the same steps.
 
-**Deploy Spark Cluster and run benchmark job**
+### Deploy Spark Cluster and run benchmark job
 
 1\. First, install the Flinkrock tool via pip
 
@@ -261,7 +261,7 @@ If `hdfs dfs -ls /` returns errors, restart HDFS.
 $HADOOP_HOME/sbin/start-dfs.sh
 ```
 
-9\. Submit the benchmark job.
+####9\. Submit the benchmark job.
 
 Since you are now in the primary node of your Flintrock OSS Spark cluster, set `YOUR_S3_BUCKET` as an environment variable within this node as well.
 
@@ -355,7 +355,7 @@ for instructions.
 aws s3 cp spark-benchmark-assembly-3.3.0.jar s3://$YOUR_S3_BUCKET/blog/jar/spark-benchmark-assembly-3.3.0.jar
 ```
 
-**Deploy EMR Cluster and run benchmark job**
+### Deploy EMR Cluster and run benchmark job
 
 1\. Spin up EMR in CLI Shell using command line. Configure EMR with 1
 primary (`c5d.9xlarge`) and 6 Core (`c5d.9xlarge`) nodes. Prior to running
