@@ -428,21 +428,14 @@ manner as we did for the OSS results and compare.
 ### Cleanup
 
 Download [scripts/cleanup-benchmark-env.sh](scripts/cleanup-benchmark-env.sh) to the benchmark environment.
-Download [scripts/cleanup-build-env.sh](scripts/cleanup-build-env.sh) to your build environment.
 
-1. If you have cloned this repository locally, change to the `scripts` directory in your **build environment**. The cleanup-build-env.sh script assumes `us-east-1` as the default region. Make sure you change it to your region as needed before executing the script. Run:
-
-```
-    ./cleanup-build-env.sh
-```
-
-2. If you have cloned this repository locally, change to the `scripts` directory in your **benchmark environment**. Make sure you edit the cleanup-benchmark-env.sh script and provide your `S3 bucket name`, your `EMR cluster ID` and your `OSS Spark cluster ID`. Run:
+1. If you have cloned this repository locally, change to the `scripts` directory in your **benchmark environment**. Make sure you edit the cleanup-benchmark-env.sh script and provide your `S3 bucket name`, your `EMR cluster ID` and your `OSS Spark cluster ID`. Run:
 
 ```
     ./cleanup-benchmark-env.sh
 ```
 
-3. If you used Cloud9 as your build environment, **outside your Cloud9 environment**, from any terminal where you have AWS CLI installed, run:
+2. If you used Cloud9 as your build environment, **outside your Cloud9 environment**, from any terminal where you have AWS CLI installed, run:
 
 ```
    export CLOUD9_ENV_ID=<cloud9 environment id>
