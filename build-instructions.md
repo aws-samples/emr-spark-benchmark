@@ -10,18 +10,7 @@ Create an AWS Cloud9 environment from the [AWS Management Console[(https://conso
 
 You must increase the size of the [Amazon Elastic Block Store (Amazon EBS)](https://aws.amazon.com/ebs/) volume attached to your AWS Cloud9 instance to 20 GB, because the default size (10 GB) is not enough. For instructions, refer to [Resize an Amazon EBS volume used by an environment](https://docs.aws.amazon.com/cloud9/latest/user-guide/move-environment.html#move-environment-resize).
 
-### 2. [AWS Command Line Interface v2 (AWS CLI v2)](https://aws.amazon.com/cli/) to access  [Amazon Elastic Container Registry (Amazon ECR)](https://aws.amazon.com/ecr/)
-You will need AWS cli version 2.1.14 or later. If you don't have AWS CLI v2 you can install it following the instructions in [Installing or updating the latest version of the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
-
-AWS Cloud9 EC2 instance uses Linux OS. If you are using AWS Cloud9 follow the commands below to install the latest AWS CLI v2:
-
-```
-curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-unzip awscliv2.zip
-sudo ./aws/install
-```
-
-### 3. Install Docker if required
+### 2. Install Docker if required
 AWS Cloud9 EC2 instance m5.xlarge comes with Docker pre-installed. Depending on your environment you may or may not need to install Docker. To install Docker follow the instructions in the [Docker Desktop page](https://docs.docker.com/desktop/#download-and-install).
 
 ## Build Benchmark application
@@ -32,39 +21,16 @@ To build our application we are going to reuse the source code for TPCDS benchma
 ```
 git clone https://github.com/aws-samples/emr-on-eks-benchmark.git
 ```
-### 2. Setup Environment variables
 
-```
-export AWS_REGION=us-east-1
-ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-ECR_URL=$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
-```
-
-### 3. Create a repository in Amazon ECR
-
-```
-aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_URL
-aws ecr create-repository --repository-name spark --image-scanning-configuration scanOnPush=true
-```
-
-### 4. Build a docker image of Apache Spark
+### 2. Build a docker image of Apache Spark
 
 First change to project root directory, and then build the Spark version 3.3.0. We use Hadoop 3.3.4. Feel free to change the Spark version to the one that you need.
 ```
 cd emr-on-eks-benchmark
-docker build -t $ECR_URL/spark:3.3.0_hadoop_3.3.4 -f docker/hadoop-aws-3.3.1/Dockerfile --build-arg HADOOP_VERSION=3.3.4 --build-arg SPARK_VERSION=3.3.0 .
+docker build -t spark:3.3.0_hadoop_3.3.4 -f docker/hadoop-aws-3.3.1/Dockerfile --build-arg HADOOP_VERSION=3.3.4 --build-arg SPARK_VERSION=3.3.0 .
 ```
 
-### 5. Push the Spark image
-
-
-Push the Spark image to the Amazon ECR repository that we had created in the previous step
-
-```
-docker push $ECR_URL/spark:3.3.0_hadoop_3.3.4
-```
-
-### 6. Build the Spark Benchmark application as a docker image
+### 3. Build the Spark Benchmark application as a docker image
 
 Build the benchmark utility based on the Spark version we created above. In order to do that we need to make sure the Dockerfile points to the correct Spark and Hadoop versions. Edit [docker/benchmark-util/Dockerfile](https://github.com/aws-samples/emr-on-eks-benchmark/blob/main/docker/benchmark-util/Dockerfile) and make sure Spark and Hadoop versions are correct. In our example we are benchmarking Spark version 3.3.0.
 
@@ -76,14 +42,14 @@ ARG HADOOP_VERSION=3.3.4
 Use this Dockerfile to build the benchmark utility as shown below
 
 ```
-docker build -t $ECR_URL/eks-spark-benchmark:3.3.0 -f docker/benchmark-util/Dockerfile --build-arg SPARK_BASE_IMAGE=$ECR_URL/spark:3.3.0_hadoop_3.3.4 .
+docker build -t eks-spark-benchmark:3.3.0 -f docker/benchmark-util/Dockerfile --build-arg SPARK_BASE_IMAGE=spark:3.3.0_hadoop_3.3.4 .
 ```
 
-### 7. Copy the benchmark application jar file from the docker image
+### 4. Copy the benchmark application jar file from the docker image
 To do this open two terminals. In the first terminal run a docker container from the image built in the previous step. In the example below we give it a name `spark-benchmark` using the `--name` argument.
 
 ```
-docker run --name spark-benchmark -it $ECR_URL/eks-spark-benchmark:3.3.0 bash
+docker run --name spark-benchmark -it eks-spark-benchmark:3.3.0 bash
 ```
 This should start a bash prompt in your spark-benchmark docker container. If the build was successful, inside the bash prompt in your docker container, you should see a jar file named `eks-spark-benchmark-assembly-1.0.jar` in the `$SPARK_HOME/examples/jars` directory as shown in the example below:
 
@@ -99,11 +65,9 @@ On another terminal in Cloud9 running the `docker ps` command shows our running 
 
 ```
 sekar:~/environment $ docker ps
-CONTAINER ID   IMAGE                                                                    COMMAND                  CREATED         STATUS         PORTS     NAMES
-9ca5b2afe778   012345678901.dkr.ecr.us-east-1.amazonaws.com/eks-spark-benchmark:3.3.0   "/opt/entrypoint.sh …"   7 seconds ago   Up 6 seconds             spark-benchmark
+CONTAINER ID   IMAGE                       COMMAND                  CREATED         STATUS         PORTS     NAMES
+9ca5b2afe778   eks-spark-benchmark:3.3.0   "/opt/entrypoint.sh …"   7 seconds ago   Up 6 seconds             spark-benchmark
 ```
-
-You will see your account number in place of `012345678901`
 
 Now you can copy the eks-spark-benchmark-assembly-1.0.jar file from the docker container into your local directory using `docker cp` command as shown below:
 
