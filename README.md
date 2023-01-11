@@ -426,3 +426,28 @@ aws emr add-steps \
 3\. Summarize the results from the output bucket
 `s3://$YOUR_S3_BUCKET/blog/EMRONEC2_TPCDS-TEST-3T-RESULT` in the same
 manner as we did for the OSS results and compare.
+
+### Cleanup
+
+Download [scripts/cleanup-benchmark-env.sh](scripts/cleanup-benchmark-env.sh) to the benchmark environment.
+Download [scripts/cleanup-build-env.sh](scripts/cleanup-build-env.sh) to your build environment.
+
+1. If you have cloned this repository locally, change to the `scripts` directory in your build environment and run:
+
+```
+    ./cleanup-build-env.sh
+```
+
+2. If you have cloned this repository locally, change to the `scripts` directory in your benchmark environment and run:
+
+```
+    ./cleanup-benchmark-env.sh
+```
+
+3. If you used Cloud9 as your build environment, from any terminal where you have AWS CLI installed, outside your Cloud9 environment run:
+
+```
+   export CLOUD9_ENV_ID=<cloud9 environment id>
+   aws cloud9 delete-environment --environment-id $CLOUD9_ENV_ID
+
+```
