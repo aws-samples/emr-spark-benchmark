@@ -30,9 +30,7 @@ for instructions.
 
 5\. A [key
 pair](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/create-key-pairs.html)
-to access the OSS Spark primary node.
-
-6\. Provide restrictive file permissions for the key pair pem/ppk file.
+to access the OSS Spark primary node. Provide restrictive file permissions for the key pair pem/ppk file.
 For example,
 
 ```
@@ -40,7 +38,7 @@ chmod 400 <key pair pem file>
 ```
 
 
-7\. Create a new s3 bucket in your test account if needed. Replace
+6\. Create a new s3 bucket in your test account if needed. Replace
 `$YOUR_S3_BUCKET` with your S3 bucket name. We suggest you export
 `YOUR_S3_BUCKET` as an environment variable.
 
@@ -49,14 +47,14 @@ export YOUR_S3_BUCKET=<Your bucket name>
 aws s3 mb s3://$YOUR_S3_BUCKET
 ```
 
-8\. Copy the TPCDS source data as input to your S3 Bucket. If not
+7\. Copy the TPCDS source data as input to your S3 Bucket. If not
 exported as an environment variable, replace $YOUR_S3_BUCKET with your
 S3 bucket name.
 
 ```
 aws s3 sync s3://blogpost-sparkoneks-us-east-1/blog/BLOG_TPCDS-TEST-3T-partitioned/ s3://$YOUR_S3_BUCKET/blog/BLOG_TPCDS-TEST-3T-partitioned/
 ```
-9\. Build the benchmark application following the instructions provided in [Steps to build spark-benchmark-assembly application](build-instructions.md). For your convenience we have also provided a sample application jar file [spark-benchmark-assembly-3.3.0.jar](https://aws-bigdata-blog.s3.amazonaws.com/artifacts/oss-spark-benchmarking/spark-benchmark-assembly-3.3.0.jar) that we have built following the same steps.
+8\. Build the benchmark application following the instructions provided in [Steps to build spark-benchmark-assembly application](build-instructions.md). For your convenience we have also provided a sample application jar file [spark-benchmark-assembly-3.3.0.jar](https://aws-bigdata-blog.s3.amazonaws.com/artifacts/oss-spark-benchmarking/spark-benchmark-assembly-3.3.0.jar) that we have built following the same steps.
 
 ### Deploy Spark Cluster and run benchmark job
 
@@ -432,19 +430,19 @@ manner as we did for the OSS results and compare.
 Download [scripts/cleanup-benchmark-env.sh](scripts/cleanup-benchmark-env.sh) to the benchmark environment.
 Download [scripts/cleanup-build-env.sh](scripts/cleanup-build-env.sh) to your build environment.
 
-1. If you have cloned this repository locally, change to the `scripts` directory in your build environment and run:
+1. If you have cloned this repository locally, change to the `scripts` directory in your **build environment** and run:
 
 ```
     ./cleanup-build-env.sh
 ```
 
-2. If you have cloned this repository locally, change to the `scripts` directory in your benchmark environment and run:
+2. If you have cloned this repository locally, change to the `scripts` directory in your **benchmark environment** and run:
 
 ```
     ./cleanup-benchmark-env.sh
 ```
 
-3. If you used Cloud9 as your build environment, from any terminal where you have AWS CLI installed, outside your Cloud9 environment run:
+3. If you used Cloud9 as your build environment, **outside your Cloud9 environment**, from any terminal where you have AWS CLI installed, run:
 
 ```
    export CLOUD9_ENV_ID=<cloud9 environment id>
