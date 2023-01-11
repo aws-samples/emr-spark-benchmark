@@ -430,13 +430,13 @@ manner as we did for the OSS results and compare.
 Download [scripts/cleanup-benchmark-env.sh](scripts/cleanup-benchmark-env.sh) to the benchmark environment.
 Download [scripts/cleanup-build-env.sh](scripts/cleanup-build-env.sh) to your build environment.
 
-1. If you have cloned this repository locally, change to the `scripts` directory in your **build environment** and run:
+1. If you have cloned this repository locally, change to the `scripts` directory in your **build environment**. The cleanup-build-env.sh script assumes `us-east-1` as the default region. Make sure you change it to your region as needed before executing the script. Run:
 
 ```
     ./cleanup-build-env.sh
 ```
 
-2. If you have cloned this repository locally, change to the `scripts` directory in your **benchmark environment** and run:
+2. If you have cloned this repository locally, change to the `scripts` directory in your **benchmark environment**. Make sure you edit the cleanup-benchmark-env.sh script and provide your `S3 bucket name`, your `EMR cluster ID` and your `OSS Spark cluster ID`. Run:
 
 ```
     ./cleanup-benchmark-env.sh
