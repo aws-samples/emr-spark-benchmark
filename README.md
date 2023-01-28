@@ -767,6 +767,6 @@ Raw Detail Output (query by CPU architecture/iterations):
 Formatted Output:
 ![Sample Output](img/F8814632-F8EC-441B-97AE-4191F3DAE811.jpeg)
 
-
-
+Formatted Chart:
+![Sample Output](img/Picture1.png)
 
