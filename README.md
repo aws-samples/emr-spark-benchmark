@@ -487,7 +487,7 @@ aws emr-serverless create-application --name "spark-defaults-v1" --type SPARK --
 
 2\. Submit job to the EMR Serverless application created in previous step using sample CLI below.
 
-(Make sure runtime role (https://docs.aws.amazon.com/emr/latest/EMR-Serverless-UserGuide/security-iam-runtime-role.html) has the appropriate s3 access to read and write from your S3 buckets, replace highlighted example bucket, if you are using different region from us-east-1, replace region and copy benchmark jar to your bucket in appropriate region where job will be submitted)
+Make sure runtime role https://docs.aws.amazon.com/emr/latest/EMR-Serverless-UserGuide/security-iam-runtime-role.html has the appropriate s3 access to read and write from your S3 buckets, replace highlighted example bucket, if you are using different region from us-east-1, replace region and copy benchmark jar to your bucket in appropriate region where job will be submitted.
 
 ```
 export APP_ID=00xxxxp6vmdyyyyy                                  #Your EMR Serverless Application Id from Previous Step 
@@ -504,8 +504,7 @@ aws emr-serverless start-job-run --application-id $APP_ID \
 ```
 
 3\. Summarize the results from the output bucket
-`s3://'$YOURBUCKET'/spark/EMRSERVERLESS_TPCDS-TEST-3T-RESULT` in the same
-manner as we did for the OSS results and compare.
+`s3://'$YOURBUCKET'/spark/EMRSERVERLESS_TPCDS-TEST-3T-RESULT` in the same manner as we did for the OSS results and compare.
 
 #### Run an Amazon EMR Serverless job with multiple CPU architectures:
 
