@@ -448,14 +448,15 @@ Download [scripts/cleanup-benchmark-env.sh](scripts/cleanup-benchmark-env.sh) to
 
 ### Pre-requisites
 
-###Run an Amazon EMR Serverless job with multiple CPU architectures:
+#### Run an Amazon EMR Serverless job with multiple CPU architectures:
 
 If you’re evaluating migrating to Graviton2 architecture on Amazon EMR Serverless workloads, we recommend testing the Spark workloads based on your real-world use cases. If you need to run workloads across multiple processor architectures, for example test the performance for Intel and Arm CPUs, follow the walkthrough in this section to get started with some concrete ideas.
 
-*Build two EMR Serverless applications, one with x86 and another with Graviton2 (ARM64):*
+### Build two EMR Serverless applications, one with x86 and another with Graviton2 (ARM64):
 
-1.  Create *Graviton2* EMR application using sample CLI below (replace subnet Ids and Security groups Ids with your environment configuration) 
+1\.  Create **Graviton2** EMR application using sample CLI below (replace subnet Ids and Security groups Ids with your environment configuration) 
 
+```
 aws emr-serverless create-application --name "spark-ARM64-defaults-v14" --type SPARK --release-label emr-6.9.0 --architecture "ARM64" --region us-east-1 --initial-capacity '{
                                           "DRIVER": {
                                               "workerCount": 1,
@@ -474,10 +475,11 @@ aws emr-serverless create-application --name "spark-ARM64-defaults-v14" --type S
                                               }
                                           }
 }'  --network-configuration '{"subnetIds": ["subnet-XXXXX","subnet-YYYYY"], "securityGroupIds": ["sg-YYYY"]}'
+```
 
-2. Create *x86* EMR application using sample CLI below (replace subnet Ids and Security groups Ids with your environment configuration) 
+2\. Create **x86** EMR application using sample CLI below (replace subnet Ids and Security groups Ids with your environment configuration) 
 
-
+```
 aws emr-serverless create-application --name "spark-x86-defaults-v14" --type SPARK --release-label emr-6.9.0 --region us-east-1  --initial-capacity '{
                                           "DRIVER": {
                                               "workerCount": 1,
@@ -496,18 +498,23 @@ aws emr-serverless create-application --name "spark-x86-defaults-v14" --type SPA
                                               }
                                           }
 }'  --network-configuration '{"subnetIds": ["subnet-XXXXX"], "securityGroupIds": ["sg-YYYYYY"]}'
+```
 
-1. Submit jobs to the applications created in previous step using sample shell script below.
+
+3\. Submit jobs to the applications created in previous step using sample shell script below.
 
 (Make sure runtime role (https://docs.aws.amazon.com/emr/latest/EMR-Serverless-UserGuide/security-iam-runtime-role.html) has the appropriate s3 access to read and write from your S3 buckets, replace highlighted example bucket, if you are using different region from us-east-1, replace region and copy benchmark jar to your bucket in appropriate region where job will be submitted)
 
-aws emr-serverless start-job-run —application-id $APP_ID \
+```
+aws emr-serverless start-job-run -—application-id $APP_ID \
 —execution-role-arn "arn:aws:iam::176294476780:role/RUNTIMEROLE" \ 
 —job-driver '{"sparkSubmit": {"entryPoint": "s3://ee-assets-prod-us-east-1/modules/0b22764e47c84c3ab594fc804031cbcd/v1/eks-spark-benchmark-assembly-3.3.0.jar","entryPointArguments": ["s3:// (http://s3//blogpost-sparkoneks-us-east-1/blog/BLOG_TPCDS-TEST-3T-partitioned)YOURBUCKET","s3://<YOURBUCKET>/spark/EMRSERVERLESS_TPCDS-TEST-3T-RESULT-GRAVITON-V9","/opt/tpcds-kit/tools","parquet","3000","1","false","'$query'","true"],"sparkSubmitParameters": "—class com.amazonaws.eks.tpcds.BenchmarkSQL "}}' —configuration-overrides '{"monitoringConfiguration": {"s3MonitoringConfiguration": {"logUri": "s3://<YOURBUCKET>/spark/logs2/"}}}' \ 
-—region us-east-1
+-—region us-east-1
+```
 
-*Optional:*  You can use below sample script to loop through multiple TPC-DS queries.
+**Optional:**  You can use below sample script to loop through multiple TPC-DS queries.
 
+```
 #!/bin/bash
 
 APP_ID=$1
@@ -542,7 +549,11 @@ for (( k = 0; k < $g; k++ )); do
         echo "running iteration $k"
         run_benchmark
 done
-
+```
 
 *Note:* Benchmark results will be available in your s3 bucket that was specified during the job submission.
 Sample output of results:
+
+4\. Summarize the results from the output bucket
+`s3://$YOUR_S3_BUCKET/blog/EMRONEC2_TPCDS-TEST-3T-RESULT` in the same
+manner as we did for the OSS results and compare.
