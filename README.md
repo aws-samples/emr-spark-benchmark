@@ -517,7 +517,7 @@ By default, when you create an EMR Serverless without specifying CPU architectur
 
 If you’re evaluating migrating to Graviton2 architecture on Amazon EMR Serverless workloads, we recommend testing the Spark workloads based on your real-world use cases. If you need to run workloads across multiple processor architectures, for example test the performance for Intel and Arm CPUs, follow the walkthrough in this section to get started with some concrete ideas.
 
-### Build two EMR Serverless applications, one with x86 and another with Graviton2 (ARM64):
+### Build two EMR Serverless applications, x86 and Graviton2(ARM64):
 
 1\.  Create **Graviton2 (ARM64)** EMR application using sample CLI below (replace subnet Ids and Security groups Ids with your environment configuration) 
 
@@ -660,10 +660,12 @@ Sample output of results:
 
 ## Analyze Spark benchmark results using Amazon Athena
 
-### Pre-requisites
+### Pre-requisites:
 
 Follow Amazon Athena workshop to setup, if you are using Amazon Athena for the first time:
 https://catalog.us-east-1.prod.workshops.aws/workshops/9981f1a1-abdc-49b5-8387-cb01d238bb78/en-US/30-basics/301-create-tables
+
+### Steps:
 
 1\. Create Athena database **spark_benchmark_results** and create Athena tables on your S3 benchmark bucket path within the new database:
 (Existing database can also be used to create tables)
@@ -755,3 +757,13 @@ FROM "spark_benchmark_results"."emr_serverless_spark_x86_detail"
 )
 group by 1) z
 ```
+
+
+3\.Shown below is a sample outputs.`.
+
+![Sample Output](img/C07807D6-D85F-4DE0-AD02-EC1E0D2DA8F0.jpeg)
+![Sample Output](img/F8814632-F8EC-441B-97AE-4191F3DAE811.jpeg)
+
+
+
+
