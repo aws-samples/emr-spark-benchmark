@@ -657,6 +657,21 @@ Sample output of results:
 4\. Summarize the results from the output bucket
 `s3://$YOUR_S3_BUCKET/blog/EMRSERVERLESS_TPCDS-TEST-3T-RESULT` in the same manner as we did for the OSS results and compare.
 
+### EMR Serverless Cleanup
+
+When you're all done, make sure to call stop-application to decommission your capacity and delete-application if you're all done.
+
+```
+aws emr-serverless stop-application \
+    --application-id $APPLICATION_ID
+```
+
+```
+aws emr-serverless delete-application \
+    --application-id $APPLICATION_ID
+
+```
+
 
 ## Analyze Spark benchmark results using Amazon Athena
 
