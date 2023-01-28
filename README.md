@@ -3,7 +3,7 @@
 This repository provides a general tool to benchmark Spark performance on EC2 and EMR. We provide
 1. [Steps to setup Open Source Spark benchmarking on EC2.](#steps-to-setup-oss-spark-benchmarking)
 2. [Steps to perform similar benchmarking on EMR (EMR on EC2) using the EMR Spark Runtime .](#steps-to-setup-emr-benchmarking)
-3. [Steps to perform similar benchmarking on EMR (EMR Serverless) using the EMR Spark Runtime.](#steps-to-setup-emr-serverless-benchmarking)
+3. [Steps to perform similar benchmarking on EMR Serverless using the EMR Spark Runtime.](#steps-to-setup-emr-serverless-benchmarking)
 
 ## Steps to setup OSS Spark Benchmarking
 
@@ -339,7 +339,7 @@ of the Avg column using the formula
 
 ![Sample Output](img/sample_output.png)
 
-## Steps to setup EMR Benchmarking
+## Steps to setup EMR Benchmarking (EMR on EC2)
 
 ### Pre-requisites
 
