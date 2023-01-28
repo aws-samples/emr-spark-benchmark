@@ -759,9 +759,12 @@ group by 1) z
 ```
 
 
-3\.Shown below is a sample outputs.`.
+3\.Shown below is a sample outputs
 
+Raw Detail Output (query by CPU architecture/iterations):
 ![Sample Output](img/C07807D6-D85F-4DE0-AD02-EC1E0D2DA8F0.jpeg)
+
+Formatted Output:
 ![Sample Output](img/F8814632-F8EC-441B-97AE-4191F3DAE811.jpeg)
 
 
