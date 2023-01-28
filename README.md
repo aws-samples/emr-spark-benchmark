@@ -658,4 +658,8 @@ Sample output of results:
 `s3://$YOUR_S3_BUCKET/blog/EMRSERVERLESS_TPCDS-TEST-3T-RESULT` in the same manner as we did for the OSS results and compare.
 
 
+## Analyze Spark benchmark results using Amazon Athena
+
+
+
 
