@@ -660,6 +660,98 @@ Sample output of results:
 
 ## Analyze Spark benchmark results using Amazon Athena
 
+### Pre-requisites
+
+Follow Amazon Athena workshop to setup, if you are using Amazon Athena for the first time:
+https://catalog.us-east-1.prod.workshops.aws/workshops/9981f1a1-abdc-49b5-8387-cb01d238bb78/en-US/30-basics/301-create-tables
+
+1\. Create Athena database **spark_benchmark_results** and create Athena tables on your S3 benchmark bucket path within the new database:
+(Existing database can also be used to create tables)
+
+a\. Create Graviton2 Spark benchmark table (make sure to point to correct S3 path in DDL below, replace $YOURBUCKET variable):
+
+```
+CREATE EXTERNAL TABLE `emr_serverless_spark_graviton2_detail`(
+  `timestamp` bigint COMMENT 'from deserializer', 
+  `iteration` int COMMENT 'from deserializer', 
+  `tags` struct<standardrun:string> COMMENT 'from deserializer', 
+  `results` array<struct<name:string,mode:string,parameters:string,jointypes:array<string>,tables:array<string>,parsingtime:double,analysistime:double,optimizationtime:double,planningtime:double,executiontime:double,breakdown:array<string>>> COMMENT 'from deserializer')
+ROW FORMAT SERDE 
+  'org.openx.data.jsonserde.JsonSerDe' 
+WITH SERDEPROPERTIES ( 
+  'paths'='configuration,iteration,results,tags,timestamp') 
+STORED AS INPUTFORMAT 
+  'org.apache.hadoop.mapred.TextInputFormat' 
+OUTPUTFORMAT 
+  'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'
+LOCATION
+  's3://$YOUBUCKET/benchmark/spark-v3-arm'
+TBLPROPERTIES (
+  'CrawlerSchemaDeserializerVersion'='1.0', 
+  'CrawlerSchemaSerializerVersion'='1.0', 
+  'averageRecordSize'='1059', 
+  'classification'='json', 
+  'compressionType'='none', 
+  'sizeKey'='1059', 
+  'transient_lastDdlTime'='1673017331', 
+  'typeOfData'='file')
+  ```
+
+b\. Create x86 Spark benchmark table (make sure to point to correct S3 path in DDL below, replace $YOURBUCKET variable):
+
+```
+CREATE EXTERNAL TABLE `emr_serverless_spark_x86_detail`(
+  `timestamp` bigint COMMENT 'from deserializer', 
+  `iteration` int COMMENT 'from deserializer', 
+  `tags` struct<standardrun:string> COMMENT 'from deserializer', 
+  `results` array<struct<name:string,mode:string,parameters:string,jointypes:array<string>,tables:array<string>,parsingtime:double,analysistime:double,optimizationtime:double,planningtime:double,executiontime:double,breakdown:array<string>>> COMMENT 'from deserializer')
+ROW FORMAT SERDE 
+  'org.openx.data.jsonserde.JsonSerDe' 
+WITH SERDEPROPERTIES ( 
+  'paths'='configuration,iteration,results,tags,timestamp') 
+STORED AS INPUTFORMAT 
+  'org.apache.hadoop.mapred.TextInputFormat' 
+OUTPUTFORMAT 
+  'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'
+LOCATION
+  's3://$YOURBUCKET/benchmark/spark-v3-x86'
+TBLPROPERTIES (
+  'CrawlerSchemaDeserializerVersion'='1.0', 
+  'CrawlerSchemaSerializerVersion'='1.0', 
+  'averageRecordSize'='1059', 
+  'classification'='json', 
+  'compressionType'='none', 
+  'sizeKey'='1059', 
+  'transient_lastDdlTime'='1673017343', 
+  'typeOfData'='file')
+  ```
+
+2\. Run spark benchmark query below and review benchmark results:
 
 
-
+```
+select 
+ query_nm ,arm_kv1[1] AS it1_arm_tt,arm_kv1[2] AS it2_arm_tt,arm_kv1[3] AS it3_arm_tt,arm_kv1[4] AS it4_arm_tt,arm_kv1[5] AS it5_arm_tt,arm_kv1[6] AS it6_arm_tt,arm_kv1[7] AS it7_arm_tt,arm_kv1[8] AS it8_arm_tt,arm_kv1[9] AS it9_arm_tt,arm_kv1[10] AS it10_arm_tt
+ ,x86_kv1[1] AS it1_x86_tt,x86_kv1[2] AS it2_x86_tt,x86_kv1[3] AS it3_x86_tt,x86_kv1[4] AS it4_x86_tt,x86_kv1[5] AS it5_x86_tt,x86_kv1[6] AS it6_x86_tt,x86_kv1[7] AS it7_x86_tt,x86_kv1[8] AS it8_x86_tt,x86_kv1[9] AS it9_x86_tt,x86_kv1[10] AS it10_x86_tt
+ from
+(SELECT query_nm, map_agg(rnk1 , Arm_Total_time) arm_kv1, map_agg(rnk1, x86_Total_time) x86_kv1
+ from
+ (
+ select x.rnk1,x.query_nm,x.iteration,x.optimizationtime as arm_optimizationtime,x.planningtime as arm_planningtime,x.executiontime as arm_executiontime, (x.optimizationtime+x.planningtime+x.executiontime) as Arm_Total_time,y.optimizationtime as x86_optimizationtime,y.planningtime as x86_planningtime,y.executiontime as x86_executiontime, (y.optimizationtime+y.planningtime+y.executiontime) as x86_Total_time from
+  (
+  SELECT row_number() over(partition by element_at(results, 1).name order by timestamp) as rnk1, iteration, element_at(results, 1).name AS query_nm,
+element_at(results, 1).parsingtime as parsingtime,element_at(results, 1).analysistime as analysistime,element_at(results, 1).optimizationtime as optimizationtime,element_at(results, 1).planningtime as  planningtime,element_at(results, 1).executiontime as executiontime
+FROM "spark_benchmark_results"."emr_serverless_spark_graviton2_detail"
+  where iteration >0
+  ) x
+  join 
+   (
+  SELECT  row_number() over(partition by element_at(results, 1).name order by timestamp) as rnk1,timestamp,iteration, element_at(results, 1).name AS query_nm,
+element_at(results, 1).parsingtime as parsingtime,element_at(results, 1).analysistime as analysistime,element_at(results, 1).optimizationtime as optimizationtime,element_at(results, 1).planningtime as  planningtime,element_at(results, 1).executiontime as executiontime
+FROM "spark_benchmark_results"."emr_serverless_spark_x86_detail"
+  where iteration >0
+  ) y
+  on x.query_nm =y.query_nm and x.rnk1 = y.rnk1
+)
+group by 1) z
+```
