@@ -457,6 +457,7 @@ Run aws configure to configure your CLI shell to point to the
 benchmarking account. Please refer to [Quick configuration with aws
 configure](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html#cli-configure-quickstart-config)
 for instructions.
+
 (If you have configured AWS CLI and uploaded jar as part of previous steps, you can skip them):
 
 
