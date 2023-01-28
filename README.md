@@ -448,6 +448,25 @@ Download [scripts/cleanup-benchmark-env.sh](scripts/cleanup-benchmark-env.sh) to
 
 ### Pre-requisites
 
+1\.  Follow pre-requisite steps to setup EMR Serverless (Permissions, Storage, Runtime Roles) using link below:
+https://docs.aws.amazon.com/emr/latest/EMR-Serverless-UserGuide/getting-started.html#gs-prerequisites
+
+(If you have configured AWS CLI and uploaded jar as part of previous steps, you can skip them):
+2\. Configure AWS CLI
+Run aws configure to configure your CLI shell to point to the
+benchmarking account. Please refer to [Quick configuration with aws
+configure](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html#cli-configure-quickstart-config)
+for instructions.
+
+3\. Upload benchmark application to S3
+
+```
+aws s3 cp spark-benchmark-assembly-3.3.0.jar s3://$YOUR_S3_BUCKET/blog/jar/spark-benchmark-assembly-3.3.0.jar
+```
+
+The architecture of your Amazon EMR Serverless application determines the type of processors that the application uses to run the job. Amazon EMR provides two architecture options for your application: x86_64 and arm64.
+By default, when you create an EMR Serverless without specifying CPU architecture (via CLI/API), application uses x86_64 processors.
+
 #### Run an Amazon EMR Serverless job with multiple CPU architectures:
 
 If you’re evaluating migrating to Graviton2 architecture on Amazon EMR Serverless workloads, we recommend testing the Spark workloads based on your real-world use cases. If you need to run workloads across multiple processor architectures, for example test the performance for Intel and Arm CPUs, follow the walkthrough in this section to get started with some concrete ideas.
