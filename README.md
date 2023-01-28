@@ -354,7 +354,7 @@ for instructions.
 aws s3 cp spark-benchmark-assembly-3.3.0.jar s3://$YOUR_S3_BUCKET/blog/jar/spark-benchmark-assembly-3.3.0.jar
 ```
 
-### Deploy EMR Cluster and run benchmark job
+### Deploy EMR on EC2 Cluster and run benchmark job
 
 1\. Spin up EMR in CLI Shell using command line. Configure EMR with 1
 primary (`c5d.9xlarge`) and 6 Core (`c5d.9xlarge`) nodes. Prior to running
