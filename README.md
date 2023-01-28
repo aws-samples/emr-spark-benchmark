@@ -565,7 +565,7 @@ aws emr-serverless create-application --name "spark-x86-defaults-v1" --type SPAR
 ```
 
 
-3\. Submit jobs to the applications created in previous step using sample CLI below. You need to submit jobs at both applications,
+3\. Submit jobs to the applications created in previous step using sample CLI below. You need to submit jobs to both applications, once you test a sample job, you can use script below to loop through all queries.
 
 Make sure runtime role https://docs.aws.amazon.com/emr/latest/EMR-Serverless-UserGuide/security-iam-runtime-role.html has the appropriate s3 access to read and write from your S3 buckets, replace highlighted example bucket, if you are using different region from us-east-1, replace region and copy benchmark jar to your bucket in appropriate region where job will be submitted.
 
@@ -583,7 +583,9 @@ aws emr-serverless start-job-run --application-id $APP_ID \
 --region "$AWS_REGION"
 ```
 
-**Optional:**  You can use below sample script to loop through multiple TPC-DS queries.
+**Run all TPC-DS queries in loop via bash script:**  
+You can use below sample script to loop through multiple TPC-DS queries.
+Copy below code snippet into a shell script:
 
 ```
 #!/bin/bash
@@ -621,6 +623,32 @@ for (( k = 0; k < $g; k++ )); do
         run_benchmark
 done
 ```
+
+Run the bash script created in previous as below:
+
+```
+export APP_ID=xyyolffnjgkkg
+bash sample_loop_script.sh $APP_ID
+```
+
+**Note** submit_tpcds-v1.sh sample bash for job submission is below:
+
+```
+export APP_ID=$1                                                #Your EMR Serverless Application Id from Previous Step 
+export query=$2                                                 #option query param, can skip if all tpc-ds queries are run
+export RUNTIMEROLE="arn:aws:iam::333333333333:role/runtimerole" #Runtime role setup from pre-req
+export YOURBUCKET=aws-emr-xxxxxx-yyyy                           #S3 bucket to write logs and benchmark results
+export AWS_REGION=us-east-1                                     #region where app was created
+
+aws emr-serverless start-job-run --application-id $APP_ID \
+--execution-role-arn "$RUNTIMEROLE" \
+--job-driver '{"sparkSubmit": {"entryPoint": "s3://ee-assets-prod-us-east-1/modules/0b22764e47c84c3ab594fc804031cbcd/v1/eks-spark-benchmark-assembly-3.3.0.jar","entryPointArguments": ["s3://blogpost-sparkoneks-us-east-1/blog/BLOG_TPCDS-TEST-3T-partitioned","s3://'$YOURBUCKET'/spark/EMRSERVERLESS_TPCDS-TEST-3T-RESULT","/opt/tpcds-kit/tools","parquet","3000","3","false",'$query',"true"],"sparkSubmitParameters": "--class com.amazonaws.eks.tpcds.BenchmarkSQL"}}' \
+--configuration-overrides '{"monitoringConfiguration": {"s3MonitoringConfiguration": {"logUri": "s3://'$YOURBUCKET'/spark/logs/"}}}' \
+--region "$AWS_REGION"
+```
+
+
+
 
 *Note:* Benchmark results will be available in your s3 bucket that was specified during the job submission.
 Sample output of results:
