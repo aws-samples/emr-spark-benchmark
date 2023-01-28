@@ -650,8 +650,11 @@ aws emr-serverless start-job-run --application-id $APP_ID \
 
 
 
-*Note:* Benchmark results will be available in your s3 bucket that was specified during the job submission.
+Benchmark results will be available in your s3 bucket that was specified during the job submission.
 Sample output of results:
 
 4\. Summarize the results from the output bucket
 `s3://$YOUR_S3_BUCKET/blog/EMRSERVERLESS_TPCDS-TEST-3T-RESULT` in the same manner as we did for the OSS results and compare.
+
+
+
