@@ -493,7 +493,7 @@ Make sure runtime role https://docs.aws.amazon.com/emr/latest/EMR-Serverless-Use
 export APP_ID=00xxxxp6vmdyyyyy                                  #Your EMR Serverless Application Id from Previous Step 
 export RUNTIMEROLE="arn:aws:iam::333333333333:role/runtimerole" #Runtime role setup from pre-req
 export YOURBUCKET=aws-emr-xxxxxx-yyyy                           #S3 bucket to write logs and benchmark results
-export query='q1-2.4\,q2-2.4'                                   #option query param, can skip if coded like sample below
+export query='q1-2.4\,q2-2.4'                                   #option query param, can skip if all tpc-ds queries are run
 export REGION=us-east-1                                         #region where app was created
 
 aws emr-serverless start-job-run --application-id $APP_ID \
