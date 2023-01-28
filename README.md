@@ -460,11 +460,50 @@ for instructions.
 
 (If you have configured AWS CLI and uploaded jar as part of previous steps, you can skip them):
 
+### Create an EMR Serverless application:
+
+1\. Create EMR application using sample CLI below (replace subnet Ids and Security groups Ids with your environment configuration) 
+
+```
+aws emr-serverless create-application --name "spark-defaults-v1" --type SPARK --release-label emr-6.9.0 --region us-east-1  --initial-capacity '{
+                                          "DRIVER": {
+                                              "workerCount": 1,
+                                              "workerConfiguration": {
+                                                  "cpu": "4vCPU",
+                                                  "memory": "16GB",
+                                                  "disk": "200GB"
+                                              }
+                                          },
+                                          "EXECUTOR": {
+                                              "workerCount": 100,
+                                              "workerConfiguration": {
+                                                  "cpu": "4vCPU",
+                                                  "memory": "16GB",
+                                                "disk": "200GB"
+                                              }
+                                          }
+}'  --network-configuration '{"subnetIds": ["subnet-XXXXX"], "securityGroupIds": ["sg-YYYYYY"]}'
+```
+
+2\. Submit job to the EMR Serverless application created in previous step using sample CLI below.
+
+(Make sure runtime role (https://docs.aws.amazon.com/emr/latest/EMR-Serverless-UserGuide/security-iam-runtime-role.html) has the appropriate s3 access to read and write from your S3 buckets, replace highlighted example bucket, if you are using different region from us-east-1, replace region and copy benchmark jar to your bucket in appropriate region where job will be submitted)
+
+```
+aws emr-serverless start-job-run -—application-id $APP_ID \
+—execution-role-arn "arn:aws:iam::176294476780:role/RUNTIMEROLE" \ 
+—job-driver '{"sparkSubmit": {"entryPoint": "s3://ee-assets-prod-us-east-1/modules/0b22764e47c84c3ab594fc804031cbcd/v1/eks-spark-benchmark-assembly-3.3.0.jar","entryPointArguments": ["s3:// (http://s3//blogpost-sparkoneks-us-east-1/blog/BLOG_TPCDS-TEST-3T-partitioned","s3://<YOURBUCKET>/spark/EMRSERVERLESS_TPCDS-TEST-3T-RESULT-GRAVITON-V9","/opt/tpcds-kit/tools","parquet","3000","1","false","'$query'","true"],"sparkSubmitParameters": "—class com.amazonaws.eks.tpcds.BenchmarkSQL "}}' —configuration-overrides '{"monitoringConfiguration": {"s3MonitoringConfiguration": {"logUri": "s3://<YOURBUCKET>/spark/logs2/"}}}' \ 
+-—region us-east-1
+```
+
+3\. Summarize the results from the output bucket
+`s3://$YOUR_S3_BUCKET/blog/EMRSERVERLESS_TPCDS-TEST-3T-RESULT` in the same
+manner as we did for the OSS results and compare.
+
+#### Run an Amazon EMR Serverless job with multiple CPU architectures:
 
 The architecture of your Amazon EMR Serverless application determines the type of processors that the application uses to run the job. Amazon EMR provides two architecture options for your application: x86_64 and arm64.
 By default, when you create an EMR Serverless without specifying CPU architecture (via CLI/API), application uses x86_64 processors.
-
-#### Run an Amazon EMR Serverless job with multiple CPU architectures:
 
 If you’re evaluating migrating to Graviton2 architecture on Amazon EMR Serverless workloads, we recommend testing the Spark workloads based on your real-world use cases. If you need to run workloads across multiple processor architectures, for example test the performance for Intel and Arm CPUs, follow the walkthrough in this section to get started with some concrete ideas.
 
