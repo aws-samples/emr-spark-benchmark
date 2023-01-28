@@ -490,14 +490,21 @@ aws emr-serverless create-application --name "spark-defaults-v1" --type SPARK --
 (Make sure runtime role (https://docs.aws.amazon.com/emr/latest/EMR-Serverless-UserGuide/security-iam-runtime-role.html) has the appropriate s3 access to read and write from your S3 buckets, replace highlighted example bucket, if you are using different region from us-east-1, replace region and copy benchmark jar to your bucket in appropriate region where job will be submitted)
 
 ```
-aws emr-serverless start-job-run -—application-id $APP_ID \
-—execution-role-arn "arn:aws:iam::176294476780:role/RUNTIMEROLE" \ 
-—job-driver '{"sparkSubmit": {"entryPoint": "s3://ee-assets-prod-us-east-1/modules/0b22764e47c84c3ab594fc804031cbcd/v1/eks-spark-benchmark-assembly-3.3.0.jar","entryPointArguments": ["s3:// (http://s3//blogpost-sparkoneks-us-east-1/blog/BLOG_TPCDS-TEST-3T-partitioned","s3://<YOURBUCKET>/spark/EMRSERVERLESS_TPCDS-TEST-3T-RESULT-GRAVITON-V9","/opt/tpcds-kit/tools","parquet","3000","1","false","'$query'","true"],"sparkSubmitParameters": "—class com.amazonaws.eks.tpcds.BenchmarkSQL "}}' —configuration-overrides '{"monitoringConfiguration": {"s3MonitoringConfiguration": {"logUri": "s3://<YOURBUCKET>/spark/logs2/"}}}' \ 
--—region us-east-1
+export APP_ID=00xxxxp6vmdyyyyy                                  #Your EMR Serverless Application Id from Previous Step 
+export RUNTIMEROLE="arn:aws:iam::333333333333:role/runtimerole" #Runtime role setup from pre-req
+export YOURBUCKET=aws-emr-xxxxxx-yyyy                           #S3 bucket to write logs and benchmark results
+export query='q1-2.4\,q2-2.4'                                   #option query param, can skip if coded like sample below
+export REGION=us-east-1                                         #region where app was created
+
+aws emr-serverless start-job-run --application-id $APP_ID \
+--execution-role-arn "$RUNTIMEROLE" \
+--job-driver '{"sparkSubmit": {"entryPoint": "s3://ee-assets-prod-us-east-1/modules/0b22764e47c84c3ab594fc804031cbcd/v1/eks-spark-benchmark-assembly-3.3.0.jar","entryPointArguments": ["s3://blogpost-sparkoneks-us-east-1/blog/BLOG_TPCDS-TEST-3T-partitioned","s3://'$YOURBUCKET'/spark/EMRSERVERLESS_TPCDS-TEST-3T-RESULT","/opt/tpcds-kit/tools","parquet","3000","3","false","q1-v2.4,q10-v2.4","true"],"sparkSubmitParameters": "--class com.amazonaws.eks.tpcds.BenchmarkSQL"}}' \
+--configuration-overrides '{"monitoringConfiguration": {"s3MonitoringConfiguration": {"logUri": "s3://'$YOURBUCKET'/spark/logs/"}}}' \
+--region "$REGION"
 ```
 
 3\. Summarize the results from the output bucket
-`s3://$YOUR_S3_BUCKET/blog/EMRSERVERLESS_TPCDS-TEST-3T-RESULT` in the same
+`s3://'$YOURBUCKET'/spark/EMRSERVERLESS_TPCDS-TEST-3T-RESULT` in the same
 manner as we did for the OSS results and compare.
 
 #### Run an Amazon EMR Serverless job with multiple CPU architectures:
