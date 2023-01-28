@@ -598,7 +598,7 @@ arr=("q21-v2.4" "q22-v2.4" "q23a-v2.4" "q23b-v2.4" "q24a-v2.4" "q24b-v2.4" "q25-
 function run_benchmark(){
         for (( i = 0; i < "${#arr[@]}"; i++ )); do
                         echo  "${arr[$i]}"
-                        job_id=$(bash submit_tpcds-v1.sh "${arr[$i]}" "$APP_ID" | jq -c '.jobRunId')
+                        job_id=$(bash submit_tpcds.sh "${arr[$i]}" "$APP_ID" | jq -c '.jobRunId')
                         job_id=$(echo "$job_id" | tr -d '"')
                         state=""
                         while [[ "$state" != "SUCCESS" ]] && [[ "$state" != "FAILED" ]] && [[ "$state" != "CANCELLED" ]];
@@ -624,14 +624,14 @@ for (( k = 0; k < $g; k++ )); do
 done
 ```
 
-Run the bash script created in previous as below:
+Run the bash script created in previous step as below:
 
 ```
 export APP_ID=xyyolffnjgkkg
 bash sample_loop_script.sh $APP_ID
 ```
 
-**Note** submit_tpcds-v1.sh sample bash for job submission is below:
+**Note:** submit_tpcds.sh sample bash for job submission is below:
 
 ```
 export APP_ID=$1                                                #Your EMR Serverless Application Id from Previous Step 
