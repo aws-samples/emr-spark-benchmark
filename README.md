@@ -482,7 +482,7 @@ aws emr-serverless create-application --name "spark-defaults-v1" --type SPARK --
                                                 "disk": "200GB"
                                               }
                                           }
-}'  --network-configuration '{"subnetIds": ["subnet-XXXXX"], "securityGroupIds": ["sg-YYYYYY"]}'
+}'  --network-configuration '{"subnetIds": ["subnet-0YYYYYYYYY", "subnet-0ZZZZZZZZZ"], "securityGroupIds": ["sg-0AAAAAA"]}'
 ```
 
 2\. Submit job to the EMR Serverless application created in previous step using sample CLI below.
