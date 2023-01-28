@@ -458,7 +458,7 @@ benchmarking account. Please refer to [Quick configuration with aws
 configure](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html#cli-configure-quickstart-config)
 for instructions.
 
-(If you have configured AWS CLI and uploaded jar as part of previous steps, you can skip them):
+(If you have configured AWS CLI as part of previous steps, you can skip them):
 
 ### Create an EMR Serverless application:
 
@@ -515,10 +515,10 @@ If you’re evaluating migrating to Graviton2 architecture on Amazon EMR Serverl
 
 ### Build two EMR Serverless applications, one with x86 and another with Graviton2 (ARM64):
 
-1\.  Create **Graviton2** EMR application using sample CLI below (replace subnet Ids and Security groups Ids with your environment configuration) 
+1\.  Create **Graviton2 (ARM64)** EMR application using sample CLI below (replace subnet Ids and Security groups Ids with your environment configuration) 
 
 ```
-aws emr-serverless create-application --name "spark-ARM64-defaults-v14" --type SPARK --release-label emr-6.9.0 --architecture "ARM64" --region us-east-1 --initial-capacity '{
+aws emr-serverless create-application --name "spark-ARM64-defaults-v1" --type SPARK --release-label emr-6.9.0 --architecture "ARM64" --region us-east-1 --initial-capacity '{
                                           "DRIVER": {
                                               "workerCount": 1,
                                               "workerConfiguration": {
@@ -541,7 +541,7 @@ aws emr-serverless create-application --name "spark-ARM64-defaults-v14" --type S
 2\. Create **x86** EMR application using sample CLI below (replace subnet Ids and Security groups Ids with your environment configuration) 
 
 ```
-aws emr-serverless create-application --name "spark-x86-defaults-v14" --type SPARK --release-label emr-6.9.0 --region us-east-1  --initial-capacity '{
+aws emr-serverless create-application --name "spark-x86-defaults-v1" --type SPARK --release-label emr-6.9.0 --region us-east-1  --initial-capacity '{
                                           "DRIVER": {
                                               "workerCount": 1,
                                               "workerConfiguration": {
@@ -558,7 +558,7 @@ aws emr-serverless create-application --name "spark-x86-defaults-v14" --type SPA
                                                 "disk": "200GB"
                                               }
                                           }
-}'  --network-configuration '{"subnetIds": ["subnet-XXXXX"], "securityGroupIds": ["sg-YYYYYY"]}'
+}'  --network-configuration '{"subnetIds": ["subnet-XXXXX","subnet-YYYYY"], "securityGroupIds": ["sg-YYYYYY"]}'
 ```
 
 
