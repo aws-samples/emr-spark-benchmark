@@ -453,7 +453,7 @@ Download [scripts/cleanup-benchmark-env.sh](scripts/cleanup-benchmark-env.sh) to
 https://docs.aws.amazon.com/emr/latest/EMR-Serverless-UserGuide/getting-started.html#gs-prerequisites
 
 
-2\. Configure AWS CLI
+2\. **Configure AWS CLI:**
 Run aws configure to configure your CLI shell to point to the
 benchmarking account. Please refer to [Quick configuration with aws
 configure](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html#cli-configure-quickstart-config)
