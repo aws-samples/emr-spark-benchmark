@@ -631,7 +631,7 @@ Follow [Amazon Athena workshop](https://catalog.us-east-1.prod.workshops.aws/wor
 1\. Create Athena database **spark_benchmark_results** and create Athena tables on your S3 benchmark bucket path within the new database:
 (Existing database can also be used to create tables)
 
-  a\. Create Graviton2 Spark benchmark table [Graviton2.sql](scripts/Graviton2.sql) (make sure to point to correct S3 path in DDL below, replace $YOURBUCKET variable):
+  a\. Create Graviton2 Spark benchmark table [graviton2.sql](scripts/graviton2.sql) (make sure to point to correct S3 path in DDL below, replace $YOURBUCKET variable):
 
   b\. Create x86 Spark benchmark table [x86.sql](scripts/x86.sql) (make sure to point to correct S3 path in DDL below, replace $YOURBUCKET variable):
 
