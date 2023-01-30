@@ -487,7 +487,7 @@ aws emr-serverless create-application --name "spark-defaults-v1" --type SPARK --
 }'  --network-configuration '{"subnetIds": ["subnet-XXXXXX", "subnet-YYYYY"], "securityGroupIds": ["sg-xxxxxyyyyyzzzz"]}'
 ```
 
-2\. Build the benchmark application following the steps provided in [Steps to build spark-benchmark-assembly application] https://github.com/aws-samples/emr-spark-benchmark/blob/main/build-instructions.md. Alternatively, you can download a pre-built [spark-benchmark-assembly-3.3.0.jar](https://aws-bigdata-blog.s3.amazonaws.com/artifacts/oss-spark-benchmarking/spark-benchmark-assembly-3.3.0.jar) if you want a Spark 3.3.0-based application.
+2\. Build the benchmark application following the steps provided in [Steps to build spark-benchmark-assembly application] (https://github.com/aws-samples/emr-spark-benchmark/blob/main/build-instructions.md). Alternatively, you can download a pre-built [spark-benchmark-assembly-3.3.0.jar](https://aws-bigdata-blog.s3.amazonaws.com/artifacts/oss-spark-benchmarking/spark-benchmark-assembly-3.3.0.jar) if you want a Spark 3.3.0-based application.
 
 3\. Submit job to the EMR Serverless application created in previous step using sample CLI below.
 Make sure [runtime role](https://docs.aws.amazon.com/emr/latest/EMR-Serverless-UserGuide/security-iam-runtime-role.html) has the appropriate s3 access to read and write from your S3 buckets.
@@ -565,7 +565,7 @@ aws emr-serverless create-application --name "spark-x86-defaults-v1" --type SPAR
 }'  --network-configuration '{"subnetIds": ["subnet-XXXXX","subnet-YYYYY"], "securityGroupIds": ["sg-YYYYYY"]}'
 ```
 
-2\. Build the benchmark application following the steps provided in [Steps to build spark-benchmark-assembly application] https://github.com/aws-samples/emr-spark-benchmark/blob/main/build-instructions.md. Alternatively, you can download a pre-built [spark-benchmark-assembly-3.3.0.jar](https://aws-bigdata-blog.s3.amazonaws.com/artifacts/oss-spark-benchmarking/spark-benchmark-assembly-3.3.0.jar) if you want a Spark 3.3.0-based application.
+2\. Build the benchmark application following the steps provided in [Steps to build spark-benchmark-assembly application] (https://github.com/aws-samples/emr-spark-benchmark/blob/main/build-instructions.md). Alternatively, you can download a pre-built [spark-benchmark-assembly-3.3.0.jar](https://aws-bigdata-blog.s3.amazonaws.com/artifacts/oss-spark-benchmarking/spark-benchmark-assembly-3.3.0.jar) if you want a Spark 3.3.0-based application.
 
 3\. Submit job to the EMR Serverless applications created in previous step using sample CLI below.You need to submit jobs to both applications, once you test a sample job, you can use script below to loop through all queries.
 Make sure [runtime role](https://docs.aws.amazon.com/emr/latest/EMR-Serverless-UserGuide/security-iam-runtime-role.html) has the appropriate s3 access to read and write from your S3 buckets.
