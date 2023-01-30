@@ -585,8 +585,8 @@ aws emr-serverless start-job-run --application-id $APP_ID \
 --region "$AWS_REGION"
 ```
 
-**(Optional)Isolated TPC-DS queries in loop via bash script:**  
-You can use below sample script to loop through multiple TPC-DS queries. Each query would execute in a new SparkContext each time instead of single SparkContext, this methodology helps in performance tuning, further deep dive analysis on set of queries.
+**(Optional) Isolated TPC-DS queries in loop via bash script:**  
+You can use below sample script to loop through multiple TPC-DS queries. Each query would execute in a new SparkContext each time instead of single SparkContext, this methodology helps in performance tuning, further deep dive analysis on a single query or set of queries.
 
 Download below scripts and edit RUNTIMEROLE, YOURBUCKET and other parameters as appropriate:
 [sample_loop_script.sh](scripts/sample_loop_script.sh)
