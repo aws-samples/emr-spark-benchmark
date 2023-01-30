@@ -449,9 +449,7 @@ Download [scripts/cleanup-benchmark-env.sh](scripts/cleanup-benchmark-env.sh) to
 
 ### Pre-requisites
 
-1\.  Follow pre-requisite steps to setup EMR Serverless (Permissions, Storage, Runtime Roles) using link below:
-https://docs.aws.amazon.com/emr/latest/EMR-Serverless-UserGuide/getting-started.html#gs-prerequisites
-
+1\.  Follow [pre-requisite](https://docs.aws.amazon.com/emr/latest/EMR-Serverless-UserGuide/getting-started.html#gs-prerequisites) steps to setup EMR Serverless (Permissions, Storage, Runtime Roles).
 
 2\. **Configure AWS CLI:**
 Run aws configure to configure your CLI shell to point to the
