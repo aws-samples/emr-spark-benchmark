@@ -580,7 +580,7 @@ export ITERATION=1                                              #number of itera
 
 aws emr-serverless start-job-run --application-id $APP_ID \
 --execution-role-arn "$RUNTIMEROLE" \
---job-driver '{"sparkSubmit": {"entryPoint": "s3://ee-assets-prod-us-east-1/modules/0b22764e47c84c3ab594fc804031cbcd/v1/eks-spark-benchmark-assembly-3.3.0.jar","entryPointArguments": ["s3://blogpost-sparkoneks-us-east-1/blog/BLOG_TPCDS-TEST-3T-partitioned","s3://'$YOURBUCKET'/spark/EMRSERVERLESS_TPCDS-TEST-3T-RESULT","/opt/tpcds-kit/tools","parquet","3000",'$ITERATION',"false",'$query',"true"],"sparkSubmitParameters": "--class com.amazonaws.eks.tpcds.BenchmarkSQL"}}' \
+--job-driver '{"sparkSubmit": {"entryPoint": "s3://'$YOURBUCKET'/jars/eks-spark-benchmark-assembly-3.3.0.jar","entryPointArguments": ["s3://blogpost-sparkoneks-us-east-1/blog/BLOG_TPCDS-TEST-3T-partitioned","s3://'$YOURBUCKET'/spark/EMRSERVERLESS_TPCDS-TEST-3T-RESULT","/opt/tpcds-kit/tools","parquet","3000",'$ITERATION',"false",'$query',"true"],"sparkSubmitParameters": "--class com.amazonaws.eks.tpcds.BenchmarkSQL"}}' \
 --configuration-overrides '{"monitoringConfiguration": {"s3MonitoringConfiguration": {"logUri": "s3://'$YOURBUCKET'/spark/logs/"}}}' \
 --region "$AWS_REGION"
 ```
@@ -641,19 +641,17 @@ export query=$2                                                 #option query pa
 export RUNTIMEROLE="arn:aws:iam::333333333333:role/runtimerole" #Runtime role setup from pre-req
 export YOURBUCKET=aws-emr-xxxxxx-yyyy                           #S3 bucket to write logs and benchmark results
 export AWS_REGION=us-east-1                                     #region where app was created
+export ITERATION=1                                              #number of iterations to be run
 
 aws emr-serverless start-job-run --application-id $APP_ID \
 --execution-role-arn "$RUNTIMEROLE" \
---job-driver '{"sparkSubmit": {"entryPoint": "s3://ee-assets-prod-us-east-1/modules/0b22764e47c84c3ab594fc804031cbcd/v1/eks-spark-benchmark-assembly-3.3.0.jar","entryPointArguments": ["s3://blogpost-sparkoneks-us-east-1/blog/BLOG_TPCDS-TEST-3T-partitioned","s3://'$YOURBUCKET'/spark/EMRSERVERLESS_TPCDS-TEST-3T-RESULT","/opt/tpcds-kit/tools","parquet","3000","3","false",'$query',"true"],"sparkSubmitParameters": "--class com.amazonaws.eks.tpcds.BenchmarkSQL"}}' \
+--job-driver '{"sparkSubmit": {"entryPoint": "s3://'$YOURBUCKET'/jars/spark-benchmark-assembly-3.3.0.jar","entryPointArguments": ["s3://blogpost-sparkoneks-us-east-1/blog/BLOG_TPCDS-TEST-3T-partitioned","s3://'$YOURBUCKET'/spark/EMRSERVERLESS_TPCDS-TEST-3T-RESULT","/opt/tpcds-kit/tools","parquet","3000",'$ITERATION',"false",'$query',"true"],"sparkSubmitParameters": "--class com.amazonaws.eks.tpcds.BenchmarkSQL"}}' \
 --configuration-overrides '{"monitoringConfiguration": {"s3MonitoringConfiguration": {"logUri": "s3://'$YOURBUCKET'/spark/logs/"}}}' \
 --region "$AWS_REGION"
 ```
 
 
-
-
 Benchmark results will be available in your s3 bucket that was specified during the job submission.
-Sample output of results:
 
 4\. Summarize the results from the output bucket
 `s3://'$YOURBUCKET'/spark/EMRSERVERLESS_TPCDS-TEST-3T-RESULT` in the same manner as we did for the OSS results and compare.
@@ -672,7 +670,6 @@ aws emr-serverless delete-application \
     --application-id $APPLICATION_ID
 
 ```
-
 
 ## Analyze Spark benchmark results using Amazon Athena
 
