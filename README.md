@@ -679,8 +679,7 @@ aws emr-serverless delete-application \
 
 ### Pre-requisites:
 
-Follow Amazon Athena workshop to setup, if you are using Amazon Athena for the first time:
-https://catalog.us-east-1.prod.workshops.aws/workshops/9981f1a1-abdc-49b5-8387-cb01d238bb78/en-US/30-basics/301-create-tables
+Follow [Amazon Athena workshop](https://catalog.us-east-1.prod.workshops.aws/workshops/9981f1a1-abdc-49b5-8387-cb01d238bb78/en-US/30-basics/301-create-tables) to setup if you are using Amazon Athena for the first time.
 
 ### Steps:
 
