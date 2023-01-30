@@ -585,8 +585,8 @@ aws emr-serverless start-job-run --application-id $APP_ID \
 --region "$AWS_REGION"
 ```
 
-**Run all TPC-DS queries in loop via bash script:**  
-You can use below sample script to loop through multiple TPC-DS queries.
+**(Optional)Isolated TPC-DS queries in loop via bash script:**  
+You can use below sample script to loop through multiple TPC-DS queries. Each query would execute in a new SparkContext each time instead of single SparkContext, this methodology helps in performance tuning, further deep dive analysis on set of queries.
 
 Download below scripts and edit RUNTIMEROLE, YOURBUCKET and other parameters as appropriate:
 [sample_loop_script.sh](scripts/sample_loop_script.sh)
@@ -628,12 +628,11 @@ Follow [Amazon Athena workshop](https://catalog.us-east-1.prod.workshops.aws/wor
 
 ### Steps:
 
-1\. Create Athena database **spark_benchmark_results** and create Athena tables on your S3 benchmark bucket path within the new database:
-(Existing database can also be used to create tables)
+1\. Create Athena database **spark_benchmark_results** and create Athena tables on your S3 benchmark bucket path within the new database.
 
-  a\. Create Graviton2 Spark benchmark table [graviton2.sql](scripts/graviton2.sql) (make sure to point to correct S3 path in DDL below, replace $YOURBUCKET variable):
+  a\. Create Graviton2 Spark benchmark table [graviton2.sql](scripts/graviton2.sql) (point to correct S3 path in the DDL, replace $YOURBUCKET variable).
 
-  b\. Create x86 Spark benchmark table [x86.sql](scripts/x86.sql) (make sure to point to correct S3 path in DDL below, replace $YOURBUCKET variable):
+  b\. Create x86 Spark benchmark table [x86.sql](scripts/x86.sql) (point to correct S3 path in the DDL, replace $YOURBUCKET variable).
 
 2\. Run spark benchmark query [benchmark.sql](scripts/benchmark.sql) and review benchmark results:
 
