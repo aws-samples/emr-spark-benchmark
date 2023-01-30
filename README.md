@@ -510,7 +510,7 @@ aws emr-serverless start-job-run --application-id $APP_ID \
 3\. Summarize the results from the output bucket
 `s3://'$YOURBUCKET'/spark/EMRSERVERLESS_TPCDS-TEST-3T-RESULT` in the same manner as we did for the OSS results and compare.
 
-#### Run an Amazon EMR Serverless job with multiple CPU architectures:
+## Run an Amazon EMR Serverless job with multiple CPU architectures:
 
 The architecture of your Amazon EMR Serverless application determines the type of processors that the application uses to run the job. Amazon EMR provides two architecture options for your application: x86_64 and arm64.
 By default, when you create an EMR Serverless without specifying CPU architecture (via CLI/API), application uses x86_64 processors.
