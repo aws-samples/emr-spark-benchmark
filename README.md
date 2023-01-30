@@ -631,65 +631,11 @@ Follow [Amazon Athena workshop](https://catalog.us-east-1.prod.workshops.aws/wor
 1\. Create Athena database **spark_benchmark_results** and create Athena tables on your S3 benchmark bucket path within the new database:
 (Existing database can also be used to create tables)
 
-a\. Create Graviton2 Spark benchmark table (make sure to point to correct S3 path in DDL below, replace $YOURBUCKET variable):
+  a\. Create Graviton2 Spark benchmark table [Graviton2.sql](scripts/Graviton2.sql) (make sure to point to correct S3 path in DDL below, replace $YOURBUCKET variable):
 
-```
-CREATE EXTERNAL TABLE `emr_serverless_spark_graviton2_detail`(
-  `timestamp` bigint COMMENT 'from deserializer', 
-  `iteration` int COMMENT 'from deserializer', 
-  `tags` struct<standardrun:string> COMMENT 'from deserializer', 
-  `results` array<struct<name:string,mode:string,parameters:string,jointypes:array<string>,tables:array<string>,parsingtime:double,analysistime:double,optimizationtime:double,planningtime:double,executiontime:double,breakdown:array<string>>> COMMENT 'from deserializer')
-ROW FORMAT SERDE 
-  'org.openx.data.jsonserde.JsonSerDe' 
-WITH SERDEPROPERTIES ( 
-  'paths'='configuration,iteration,results,tags,timestamp') 
-STORED AS INPUTFORMAT 
-  'org.apache.hadoop.mapred.TextInputFormat' 
-OUTPUTFORMAT 
-  'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'
-LOCATION
-  's3://$YOUBUCKET/benchmark/spark-v3-arm'
-TBLPROPERTIES (
-  'CrawlerSchemaDeserializerVersion'='1.0', 
-  'CrawlerSchemaSerializerVersion'='1.0', 
-  'averageRecordSize'='1059', 
-  'classification'='json', 
-  'compressionType'='none', 
-  'sizeKey'='1059', 
-  'transient_lastDdlTime'='1673017331', 
-  'typeOfData'='file')
-  ```
+  b\. Create x86 Spark benchmark table [x86.sql](scripts/x86.sql) (make sure to point to correct S3 path in DDL below, replace $YOURBUCKET variable):
 
-b\. Create x86 Spark benchmark table (make sure to point to correct S3 path in DDL below, replace $YOURBUCKET variable):
-
-```
-CREATE EXTERNAL TABLE `emr_serverless_spark_x86_detail`(
-  `timestamp` bigint COMMENT 'from deserializer', 
-  `iteration` int COMMENT 'from deserializer', 
-  `tags` struct<standardrun:string> COMMENT 'from deserializer', 
-  `results` array<struct<name:string,mode:string,parameters:string,jointypes:array<string>,tables:array<string>,parsingtime:double,analysistime:double,optimizationtime:double,planningtime:double,executiontime:double,breakdown:array<string>>> COMMENT 'from deserializer')
-ROW FORMAT SERDE 
-  'org.openx.data.jsonserde.JsonSerDe' 
-WITH SERDEPROPERTIES ( 
-  'paths'='configuration,iteration,results,tags,timestamp') 
-STORED AS INPUTFORMAT 
-  'org.apache.hadoop.mapred.TextInputFormat' 
-OUTPUTFORMAT 
-  'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'
-LOCATION
-  's3://$YOURBUCKET/benchmark/spark-v3-x86'
-TBLPROPERTIES (
-  'CrawlerSchemaDeserializerVersion'='1.0', 
-  'CrawlerSchemaSerializerVersion'='1.0', 
-  'averageRecordSize'='1059', 
-  'classification'='json', 
-  'compressionType'='none', 
-  'sizeKey'='1059', 
-  'transient_lastDdlTime'='1673017343', 
-  'typeOfData'='file')
-  ```
-
-2\. Run spark benchmark query[benchmark.sql](scripts/benchmark.sql) and review benchmark results:
+2\. Run spark benchmark query [benchmark.sql](scripts/benchmark.sql) and review benchmark results:
 
 3\.Shown below are sample outputs and charts:
 
