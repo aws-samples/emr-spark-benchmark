@@ -15,80 +15,16 @@ AWS Cloud9 EC2 instance m5.xlarge comes with Docker pre-installed. Depending on 
 
 ## Build Benchmark application
 
-### 1. Create a project folder (emr-serverless-benchmark) and download the benchmark jar file into your local project folder. 
-
-Copy the benchmark utility application JAR file spark-benchmark-assembly-3.3.0.jar that you had built earlier Or if you are using Spark 3.3.0 you could download a pre-built jar: [spark-benchmark-assembly-3.3.0.jar](https://aws-bigdata-blog.s3.amazonaws.com/artifacts/oss-spark-benchmarking/spark-benchmark-assembly-3.3.0.jar)
-
-
-### 2. Build a docker image of Apache Spark
+### Build a custom docker image on top of EMR Serverless
 
 First change to project root directory, and then build the Spark version 3.3.0. We use Hadoop 3.3.4. Feel free to change the Spark version to the one that you need.
-```
-cd emr-serverless-benchmark
-
-create a Dockerfile with below content:
-===========================================
-# Dockerfile
-FROM public.ecr.aws/emr-serverless/spark/emr-6.9.0:latest
-
-USER root
-ADD spark-benchmark-assembly-3.3.0.jar /usr/lib/spark/jars/spark-benchmark-assembly-3.3.0.jar
-
-# EMRS will run the image as hadoop
-USER hadoop:hadoop
-===========================================
-Copy jar to your project directoty and execute code below:
-
-docker build -t .
-```
-
-### 3. Build the Spark Benchmark application as a docker image
-
-Build the benchmark utility based on the Spark version we created above. In order to do that we need to make sure the Dockerfile points to the correct Spark and Hadoop versions. Edit [docker/benchmark-util/Dockerfile](https://github.com/aws-samples/emr-on-eks-benchmark/blob/main/docker/benchmark-util/Dockerfile) and make sure Spark and Hadoop versions are correct. In our example we are benchmarking Spark version 3.3.0.
 
 ```
-ARG SPARK_VERSION=3.3.0
-ARG HADOOP_VERSION=3.3.4
-```
+export ECR_URL=9876543210.dkr.ecr.us-east-1.amazonaws.com
+git clone https://github.com/aws-samples/emr-on-eks-benchmark.git
+cd emr-on-eks-benchmark
 
-Use this Dockerfile to build the benchmark utility as shown below
+docker build -t $ECR_URL/eks-spark-benchmark:emrs6.9 -f docker/benchmark-util/Dockerfile --build-arg SPARK_BASE_IMAGE=public.ecr.aws/emr-serverless/spark/emr-6.9.0:latest .
 
-```
-docker build -t eks-spark-benchmark:3.3.0 -f docker/benchmark-util/Dockerfile --build-arg SPARK_BASE_IMAGE=spark:3.3.0_hadoop_3.3.4 .
-```
-
-### 4. Copy the benchmark application jar file from the docker image
-To do this open two terminals. In the first terminal run a docker container from the image built in the previous step. In the example below we give it a name `spark-benchmark` using the `--name` argument.
-
-```
-docker run --name spark-benchmark -it eks-spark-benchmark:3.3.0 bash
-```
-This should start a bash prompt in your spark-benchmark docker container. If the build was successful, inside the bash prompt in your docker container, you should see a jar file named `eks-spark-benchmark-assembly-1.0.jar` in the `$SPARK_HOME/examples/jars` directory as shown in the example below:
-
-```
-hadoop@9ca5b2afe778:/opt/spark/work-dir$ pwd
-/opt/spark/work-dir
-hadoop@9ca5b2afe778:/opt/spark/work-dir$ cd ../examples/jars
-hadoop@9ca5b2afe778:/opt/spark/examples/jars$ ls
-eks-spark-benchmark-assembly-1.0.jar  scopt_2.12-3.7.1.jar  spark-examples_2.12-3.3.0.jar
-```
-
-On another terminal in Cloud9 running the `docker ps` command shows our running container. Here is an example:
-
-```
-sekar:~/environment $ docker ps
-CONTAINER ID   IMAGE                       COMMAND                  CREATED         STATUS         PORTS     NAMES
-9ca5b2afe778   eks-spark-benchmark:3.3.0   "/opt/entrypoint.sh …"   7 seconds ago   Up 6 seconds             spark-benchmark
-```
-
-Now you can copy the eks-spark-benchmark-assembly-1.0.jar file from the docker container into your local directory using `docker cp` command as shown below:
-
-```
-docker cp spark-benchmark:/opt/spark/examples/jars/eks-spark-benchmark-assembly-1.0.jar ./spark-benchmark-assembly-3.3.0.jar
-```
-
-Optionally, upload benchmark application to S3. Replace `$YOUR_S3_BUCKET` with your S3 bucket name.
-
-```
-aws s3 cp spark-benchmark-assembly-3.3.0.jar s3://$YOUR_S3_BUCKET/blog/jar/spark-benchmark-assembly-3.3.0.jar
+docker push $ECR_URL/eks-spark-benchmark:emrs6.9
 ```
