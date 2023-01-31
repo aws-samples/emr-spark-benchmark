@@ -15,7 +15,7 @@ AWS Cloud9 EC2 instance m5.xlarge comes with Docker pre-installed. Depending on 
 
 ## Build Benchmark application
 
-### Build a custom docker image on top of EMR Serverless
+### 1. Build a custom docker image on top of EMR Serverless
 
 First change to project root directory, and then build the Spark version 3.3.0. We use Hadoop 3.3.4. Feel free to change the Spark version to the one that you need.
 
@@ -27,4 +27,32 @@ cd emr-on-eks-benchmark
 docker build -t $ECR_URL/eks-spark-benchmark:emrs6.9 -f docker/benchmark-util/Dockerfile --build-arg SPARK_BASE_IMAGE=public.ecr.aws/emr-serverless/spark/emr-6.9.0:latest .
 
 docker push $ECR_URL/eks-spark-benchmark:emrs6.9
+```
+
+### 2. Create an EMR Serverless application using ECR URL:
+With this option, you don't have to copy jar to S3 bucket, instead benchmark jar will be baked inside your docker image.
+
+```
+export REGION=us-east-1       
+export EMR_RELEASE=emr-6.9.0 
+export ECR_URL=9876543210.dkr.ecr.us-east-1.amazonaws.com
+
+aws emr-serverless create-application --name "spark-custom-image" --image-configuration '{ "imageUri": "'$ECR_URL'"}' --type SPARK --release-label $EMR_RELEASE  --region $REGION  --initial-capacity '{
+                                          "DRIVER": {
+                                              "workerCount": 1,
+                                              "workerConfiguration": {
+                                                  "cpu": "4vCPU",
+                                                  "memory": "16GB",
+                                                  "disk": "120GB"
+                                              }
+                                          },
+                                          "EXECUTOR": {
+                                              "workerCount": 100,
+                                              "workerConfiguration": {
+                                                  "cpu": "4vCPU",
+                                                  "memory": "16GB",
+                                                "disk": "120GB"
+                                              }
+                                          }
+}'  --network-configuration '{"subnetIds": ["subnet-XXXXXX", "subnet-YYYYY"], "securityGroupIds": ["sg-xxxxxyyyyyzzzz"]}'
 ```
