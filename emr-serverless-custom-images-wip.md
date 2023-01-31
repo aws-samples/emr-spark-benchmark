@@ -15,8 +15,6 @@ AWS Cloud9 EC2 instance m5.xlarge comes with Docker pre-installed. Depending on 
 
 ## Build Benchmark application
 
-To build our application we are going to reuse the source code for TPCDS benchmarking application that was used to build a similar benchmarking utility from [the EMR on EKS benchmark Github repo](https://github.com/aws-samples/emr-on-eks-benchmark).
-
 ### 1. Create a project folder (emr-serverless-benchmark) and download the benchmark jar file into your local project folder. 
 
 Copy the benchmark utility application JAR file spark-benchmark-assembly-3.3.0.jar that you had built earlier Or if you are using Spark 3.3.0 you could download a pre-built jar: [spark-benchmark-assembly-3.3.0.jar](https://aws-bigdata-blog.s3.amazonaws.com/artifacts/oss-spark-benchmarking/spark-benchmark-assembly-3.3.0.jar)
@@ -27,7 +25,21 @@ Copy the benchmark utility application JAR file spark-benchmark-assembly-3.3.0.j
 First change to project root directory, and then build the Spark version 3.3.0. We use Hadoop 3.3.4. Feel free to change the Spark version to the one that you need.
 ```
 cd emr-serverless-benchmark
-docker build -t spark:3.3.0_hadoop_3.3.4 -f docker/hadoop-aws-3.3.1/Dockerfile --build-arg HADOOP_VERSION=3.3.4 --build-arg SPARK_VERSION=3.3.0 .
+
+create a Dockerfile with below content:
+===========================================
+# Dockerfile
+FROM public.ecr.aws/emr-serverless/spark/emr-6.9.0:latest
+
+USER root
+ADD spark-benchmark-assembly-3.3.0.jar /usr/lib/spark/jars/spark-benchmark-assembly-3.3.0.jar
+
+# EMRS will run the image as hadoop
+USER hadoop:hadoop
+===========================================
+Copy jar to your project directoty and execute code below:
+
+docker build -t .
 ```
 
 ### 3. Build the Spark Benchmark application as a docker image
