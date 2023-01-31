@@ -3,7 +3,7 @@
 APP_ID=$1
 export AWS_REGION="us-east-1"
 
-arr=("q21-v2.4" "q22-v2.4" "q23a-v2.4" "q23b-v2.4" "q24a-v2.4" "q24b-v2.4" "q25-v2.4" "q26-v2.4" "q27-v2.4" "q28-v2.4" "q29-v2.4" "q3-v2.4" "q30-v2.4" "q31-v2.4" "q32-v2.4" "q33-v2.4" "q34-v2.4" "q35-v2.4" "q36-v2.4" "q37-v2.4" "q38-v2.4" "q39a-v2.4" "q39b-v2.4" "q4-v2.4" "q40-v2.4")
+arr=("q23a-v2.4" "q23b-v2.4")
 
 function run_benchmark(){
         for (( i = 0; i < "${#arr[@]}"; i++ )); do
