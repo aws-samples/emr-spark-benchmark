@@ -486,7 +486,7 @@ aws emr-serverless create-application --name "spark-defaults-v1" --type SPARK --
                                           }
 }'  --network-configuration '{"subnetIds": ["subnet-XXXXXX", "subnet-YYYYY"], "securityGroupIds": ["sg-xxxxxyyyyyzzzz"]}'
 ```
-
+(#build-benchmark-and-submit-job)
 2\. Build the benchmark application following the instructions provided in [Steps to build spark-benchmark-assembly application](build-instructions.md). For your convenience we have also provided a sample application jar file [spark-benchmark-assembly-3.3.0.jar](https://aws-bigdata-blog.s3.amazonaws.com/artifacts/oss-spark-benchmarking/spark-benchmark-assembly-3.3.0.jar) that we have built following the same steps.
 
 3\. Submit job to the EMR Serverless application created in previous step using sample CLI below.
@@ -564,26 +564,7 @@ aws emr-serverless create-application --name "spark-x86-defaults-v1" --type SPAR
                                           }
 }'  --network-configuration '{"subnetIds": ["subnet-XXXXX","subnet-YYYYY"], "securityGroupIds": ["sg-YYYYYY"]}'
 ```
-
-2\. Build the benchmark application following the instructions provided in [Steps to build spark-benchmark-assembly application](build-instructions.md). For your convenience we have also provided a sample application jar file [spark-benchmark-assembly-3.3.0.jar](https://aws-bigdata-blog.s3.amazonaws.com/artifacts/oss-spark-benchmarking/spark-benchmark-assembly-3.3.0.jar) that we have built following the same steps.
-
-3\. Submit job to the EMR Serverless applications created in previous step using sample CLI below.You need to submit jobs to both applications, once you test a sample job, you can use script below to loop through all queries.
-Make sure [runtime role](https://docs.aws.amazon.com/emr/latest/EMR-Serverless-UserGuide/security-iam-runtime-role.html) has the appropriate s3 access to read and write from your S3 buckets.
-
-```
-export APP_ID=00xxxxp6vmdyyyyy                                  #Your EMR Serverless Application Id from Previous Step 
-export RUNTIMEROLE="arn:aws:iam::333333333333:role/runtimerole" #Runtime role setup from pre-req
-export YOURBUCKET=aws-emr-xxxxxx-yyyy                           #S3 bucket to write logs and benchmark results
-export query='q1-2.4\,q2-2.4'                                   #option query param, can skip if all tpc-ds queries are run
-export AWS_REGION=us-east-1                                     #region where app was created
-export ITERATION=1                                              #number of iterations to be run
-
-aws emr-serverless start-job-run --application-id $APP_ID \
---execution-role-arn "$RUNTIMEROLE" \
---job-driver '{"sparkSubmit": {"entryPoint": "s3://'$YOURBUCKET'/jars/eks-spark-benchmark-assembly-3.3.0.jar","entryPointArguments": ["s3://blogpost-sparkoneks-us-east-1/blog/BLOG_TPCDS-TEST-3T-partitioned","s3://'$YOURBUCKET'/spark/EMRSERVERLESS_TPCDS-TEST-3T-RESULT","/opt/tpcds-kit/tools","parquet","3000",'$ITERATION',"false",'$query',"true"],"sparkSubmitParameters": "--class com.amazonaws.eks.tpcds.BenchmarkSQL"}}' \
---configuration-overrides '{"monitoringConfiguration": {"s3MonitoringConfiguration": {"logUri": "s3://'$YOURBUCKET'/spark/logs/"}}}' \
---region "$AWS_REGION"
-```
+2\. [Build the benchmark application following the instructions provided in previous steps and submit the job to both applications] (#build-benchmark-and-submit-job).
 
 **(Optional) Isolated TPC-DS queries in loop via bash script:**  
 
