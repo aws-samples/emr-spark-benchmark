@@ -1,4 +1,4 @@
-# Steps to custom image with EMR Serverless for TPC-DS benchmark testing:
+# Steps to use custom image with EMR Serverless for TPC-DS benchmark testing:
 
 ## Pre-requisites
 We can complete all the steps either from a local desktop or using [AWS Cloud9](https://aws.amazon.com/cloud9/).  If you’re using AWS Cloud9, follow the instructions in the first step to spin up an AWS Cloud9 environment, otherwise skip to the next step.
