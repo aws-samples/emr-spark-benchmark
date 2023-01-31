@@ -564,7 +564,7 @@ aws emr-serverless create-application --name "spark-x86-defaults-v1" --type SPAR
                                           }
 }'  --network-configuration '{"subnetIds": ["subnet-XXXXX","subnet-YYYYY"], "securityGroupIds": ["sg-YYYYYY"]}'
 ```
-2\. [Build the benchmark application following the instructions provided in previous steps and submit the job to both applications.](#build-benchmark-application-and-submit-jobs).
+2\. [Build the benchmark application following the instructions provided in previous section and submit the job to both applications.](#build-benchmark-application-and-submit-jobs). 
 
 **(Optional) Isolated TPC-DS queries in loop via bash script:**  
 
