@@ -487,7 +487,7 @@ aws emr-serverless create-application --name "spark-defaults-v1" --type SPARK --
 }'  --network-configuration '{"subnetIds": ["subnet-XXXXXX", "subnet-YYYYY"], "securityGroupIds": ["sg-xxxxxyyyyyzzzz"]}'
 ```
    #### Build benchmark application and submit jobs
-2\. Build the benchmark application following the instructions provided in [Steps to build spark-benchmark-assembly application](build-instructions.md). For your convenience we have also provided a sample application jar file [spark-benchmark-assembly-3.3.0.jar](https://aws-bigdata-blog.s3.amazonaws.com/artifacts/oss-spark-benchmarking/spark-benchmark-assembly-3.3.0.jar) that we have built following the same steps.
+2\. Follow the instructions provided in [Steps to build spark-benchmark-assembly application](build-instructions.md). For your convenience we have also provided a sample application jar file [spark-benchmark-assembly-3.3.0.jar](https://aws-bigdata-blog.s3.amazonaws.com/artifacts/oss-spark-benchmarking/spark-benchmark-assembly-3.3.0.jar) that we have built following the same steps.
 
 3\. Submit job to the EMR Serverless application created in previous step using sample CLI below.
 Make sure [runtime role](https://docs.aws.amazon.com/emr/latest/EMR-Serverless-UserGuide/security-iam-runtime-role.html) has the appropriate s3 access to read and write from your S3 buckets.
