@@ -1,10 +1,11 @@
 # Steps to run Spark Benchmarking
 
 This repository provides a general tool to benchmark Spark performance on EC2 and EMR. We provide
-1. [Steps to setup Open Source Spark benchmarking on EC2.](#steps-to-setup-oss-spark-benchmarking)
-2. [Steps to perform similar benchmarking on EMR (EMR on EC2) using the EMR Spark Runtime .](#steps-to-setup-emr-on-ec2-benchmarking)
-3. [Steps to perform similar benchmarking on EMR Serverless using the EMR Spark Runtime.](#steps-to-setup-emr-serverless-benchmarking)
-4. **(Optional)** [Analyze Spark benchmark results using Amazon Athena.](#analyze-spark-benchmark-results-using-amazon-athena)
+1. [Setup Open Source Spark benchmarking on EC2.](#steps-to-setup-oss-spark-benchmarking)
+2. [Perform benchmarking on EMR on EC2 using the EMR Spark Runtime .](#steps-to-setup-emr-on-ec2-benchmarking)
+3. [Benchmark EMR Serverless using the EMR Spark Runtime.](#steps-to-setup-emr-serverless-benchmarking)
+4. **(Optional)** [Perform EMR Serverless benchmark via multiple CPU architectures.](#Run-an-Amazon-EMR-Serverless-job-with-multiple-CPU-architectures)
+5. **(Optional)** [Analyze Spark benchmark results using Amazon Athena.](#analyze-spark-benchmark-results-using-amazon-athena)
 
 ## Steps to setup OSS Spark Benchmarking
 
@@ -459,9 +460,9 @@ for instructions.
 
 (If you have configured AWS CLI as part of previous steps, you can skip them):
 
-### Create an EMR Serverless application with warm pool (Pre-Inital Capacity):
+### Create an EMR Serverless application with warm pool (Pre-Initial Capacity):
 
-1\. Create EMR application using sample CLI below (replace subnet Ids and Security groups Ids with your environment configuration) 
+Create EMR application using sample CLI below (replace subnet Ids and Security groups Ids with your environment configuration) 
 
 ```
 export AWS_REGION=us-east-1  #Change per your requirement
@@ -488,9 +489,9 @@ aws emr-serverless create-application --name "spark-defaults-v1" --type SPARK --
 ```
 ### Submit Jobs with pre-built benchmark utility:
 
-2\. Follow the instructions provided in [Steps to build spark-benchmark-assembly application](build-instructions.md). For your convenience we have also provided a sample application jar file [spark-benchmark-assembly-3.3.0.jar](https://aws-bigdata-blog.s3.amazonaws.com/artifacts/oss-spark-benchmarking/spark-benchmark-assembly-3.3.0.jar) that we have built following the same steps.
+1\. Follow the instructions provided in [Steps to build spark-benchmark-assembly application](build-instructions.md). For your convenience we have also provided a sample application jar file [spark-benchmark-assembly-3.3.0.jar](https://aws-bigdata-blog.s3.amazonaws.com/artifacts/oss-spark-benchmarking/spark-benchmark-assembly-3.3.0.jar) that we have built following the same steps.
 
-3\. Submit job to the EMR Serverless application created in previous step using sample CLI below.
+2\. Submit job to the EMR Serverless application created in previous step using sample CLI below.
 Make sure [runtime role](https://docs.aws.amazon.com/emr/latest/EMR-Serverless-UserGuide/security-iam-runtime-role.html) has the appropriate s3 access to read and write from your S3 buckets.
 
 ```
@@ -511,10 +512,10 @@ aws emr-serverless start-job-run --application-id $APP_ID \
 
 Instead of downloading benchmark utility jar file from s3, you could bake-in the benchmark jar inside your [EMR Serverless docker image](./emr-serverless-custom-images.md)
 
-4\. Summarize the results from the output bucket
+3\. As an output of the benchmark job you can find the summarized results from the output bucket:
 `s3://'$YOURBUCKET'/spark/EMRSERVERLESS_TPCDS-TEST-3T-RESULT` in the same manner as we did for the OSS results and compare.
 
-## Run an Amazon EMR Serverless job with multiple CPU architectures:
+## (Optional) Run an Amazon EMR Serverless job with multiple CPU architectures:
 
 The architecture of your Amazon EMR Serverless application determines the type of processors that the application uses to run the job. Amazon EMR provides two architecture options for your application: x86_64 and arm64.
 By default, when you create an EMR Serverless without specifying CPU architecture (via CLI/API), application uses x86_64 processors.
