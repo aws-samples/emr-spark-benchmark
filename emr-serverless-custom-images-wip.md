@@ -20,7 +20,7 @@ AWS Cloud9 EC2 instance m5.xlarge comes with Docker pre-installed. Depending on 
 First change to project root directory, and then build the Spark version 3.3.0. We use Hadoop 3.3.4. Feel free to change the Spark version to the one that you need.
 
 ```
-export ECR_URL=9876543210.dkr.ecr.us-east-1.amazonaws.com
+export ECR_URL="$ACCOUNTID.dkr.ecr.$AWS_REGION.amazonaws.com
 git clone https://github.com/aws-samples/emr-on-eks-benchmark.git
 cd emr-on-eks-benchmark
 
