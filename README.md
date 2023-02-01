@@ -509,7 +509,7 @@ aws emr-serverless start-job-run --application-id $APP_ID \
 ```
 ### (Optional) Submit Jobs with custom docker image:
 
-Instead of downloading benchmark utility jar file from s3, you could bake-in the benchmark jar inside your [EMR Serverless docker image](./emr-serverless-custom-images.md )
+Instead of downloading benchmark utility jar file from s3, you could bake-in the benchmark jar inside your [EMR Serverless docker image](./emr-serverless-custom-images.md)
 
 4\. Summarize the results from the output bucket
 `s3://'$YOURBUCKET'/spark/EMRSERVERLESS_TPCDS-TEST-3T-RESULT` in the same manner as we did for the OSS results and compare.
