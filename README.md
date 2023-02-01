@@ -4,7 +4,7 @@ This repository provides a general tool to benchmark Spark performance on EC2 an
 1. [Setup Open Source Spark benchmarking on EC2.](#steps-to-setup-oss-spark-benchmarking)
 2. [Perform benchmarking on EMR on EC2 using the EMR Spark Runtime .](#steps-to-setup-emr-on-ec2-benchmarking)
 3. [Benchmark EMR Serverless using the EMR Spark Runtime.](#steps-to-setup-emr-serverless-benchmarking)
-4. **(Optional)** [Perform EMR Serverless benchmark via multiple CPU architectures.](##optional-run-an-amazon-emr-serverless-job-with-multiple-cpu-architectures)
+4. **(Optional)** [Perform EMR Serverless benchmark via multiple CPU architectures.](#optional-run-an-amazon-emr-serverless-job-with-multiple-cpu-architectures)
 5. **(Optional)** [Analyze Spark benchmark results using Amazon Athena.](#analyze-spark-benchmark-results-using-amazon-athena)
 
 ## Steps to setup OSS Spark Benchmarking
