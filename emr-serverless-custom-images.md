@@ -76,3 +76,4 @@ aws emr-serverless start-job-run --application-id $APP_ID \
 --region "$AWS_REGION"
 ```
 
+As an output of the benchmark job you can find the summarized results from the output bucket: s3://'$YOURBUCKET'/spark/EMRSERVERLESS_TPCDS-TEST-3T-RESULT in the same manner as we did for the OSS results and compare.
