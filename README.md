@@ -572,7 +572,7 @@ aws emr-serverless create-application --name "spark-x86-defaults-v1" --type SPAR
 ```
 2\. [Build the benchmark application following the instructions provided in previous section and submit the job to both applications.](#build-benchmark-application-and-submit-jobs). 
 
-**(Optional) Isolated TPC-DS queries in loop via bash script:**  
+## (Optional) Isolated TPC-DS queries in loop via bash script:
 
 You can use below sample script to loop through multiple TPC-DS queries. Each query would execute in a new SparkContext each time instead of single SparkContext, this methodology helps in performance tuning, further deep dive analysis on a single query or set of queries.
 
