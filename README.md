@@ -1,8 +1,12 @@
 # Steps to run Spark Benchmarking
 
 This repository provides a general tool to benchmark Spark performance on EC2 and EMR. We provide
-1. [Steps to setup Open Source Spark benchmarking on EC2.](#steps-to-setup-oss-spark-benchmarking)
-2. [Steps to perform similar benchmarking on EMR using the EMR Spark Runtime.](#steps-to-setup-emr-benchmarking)
+1. [Setup Open Source Spark benchmarking on EC2.](#steps-to-setup-oss-spark-benchmarking)
+2. [Perform benchmarking on EMR on EC2 using the EMR Spark Runtime .](#steps-to-setup-emr-on-ec2-benchmarking)
+3. [Benchmark EMR Serverless using the EMR Spark Runtime.](#steps-to-setup-emr-serverless-benchmarking)
+  - a. **(Optional)** [Perform EMR Serverless benchmark via multiple CPU architectures.](#optional-run-an-amazon-emr-serverless-job-with-multiple-cpu-architectures)
+  - b. **(Optional)** [Isolated TPC-DS queries in loop via bash script for EMR Serverless](#optional-isolated-tpc-ds-queries-in-loop-via-bash-script)
+  - c. **(Optional)** [Analyze Spark benchmark results using Amazon Athena.](#analyze-spark-benchmark-results-using-amazon-athena)
 
 ## Steps to setup OSS Spark Benchmarking
 
@@ -338,7 +342,7 @@ of the Avg column using the formula
 
 ![Sample Output](img/sample_output.png)
 
-## Steps to setup EMR Benchmarking
+## Steps to setup EMR on EC2 Benchmarking
 
 ### Pre-requisites
 
@@ -354,7 +358,7 @@ for instructions.
 aws s3 cp spark-benchmark-assembly-3.3.0.jar s3://$YOUR_S3_BUCKET/blog/jar/spark-benchmark-assembly-3.3.0.jar
 ```
 
-### Deploy EMR Cluster and run benchmark job
+### Deploy EMR on EC2 Cluster and run benchmark job
 
 1\. Spin up EMR in CLI Shell using command line. Configure EMR with 1
 primary (`c5d.9xlarge`) and 6 Core (`c5d.9xlarge`) nodes. Prior to running
@@ -442,3 +446,197 @@ Download [scripts/cleanup-benchmark-env.sh](scripts/cleanup-benchmark-env.sh) to
    aws cloud9 delete-environment --environment-id $CLOUD9_ENV_ID
 
 ```
+
+## Steps to setup EMR Serverless Benchmarking
+
+### Pre-requisites
+
+1\.  Follow [pre-requisite](https://docs.aws.amazon.com/emr/latest/EMR-Serverless-UserGuide/getting-started.html#gs-prerequisites) steps to setup EMR Serverless (Permissions, Storage, Runtime Roles).
+
+2\. **Configure AWS CLI:**
+Run aws configure to configure your CLI shell to point to the
+benchmarking account. Please refer to [Quick configuration with aws
+configure](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html#cli-configure-quickstart-config)
+for instructions.
+
+(If you have configured AWS CLI as part of previous steps, you can skip them):
+
+### Create an EMR Serverless application with warm pool (Pre-Initial Capacity):
+
+Create EMR application using sample CLI below (replace subnet Ids and Security groups Ids with your environment configuration) 
+
+```
+export AWS_REGION=us-east-1  #Change per your requirement
+export EMR_RELEASE=emr-6.9.0 #EMR Release Label
+
+aws emr-serverless create-application --name "spark-defaults-v1" --type SPARK --release-label $EMR_RELEASE --architecture "ARM64" --region $AWS_REGION  --initial-capacity '{
+                                          "DRIVER": {
+                                              "workerCount": 1,
+                                              "workerConfiguration": {
+                                                  "cpu": "4vCPU",
+                                                  "memory": "16GB",
+                                                  "disk": "120GB"
+                                              }
+                                          },
+                                          "EXECUTOR": {
+                                              "workerCount": 100,
+                                              "workerConfiguration": {
+                                                  "cpu": "4vCPU",
+                                                  "memory": "16GB",
+                                                "disk": "120GB"
+                                              }
+                                          }
+}'  --network-configuration '{"subnetIds": ["subnet-XXXXXX", "subnet-YYYYY"], "securityGroupIds": ["sg-xxxxxyyyyyzzzz"]}'
+```
+### Submit Jobs with pre-built benchmark utility:
+
+1\. Follow the instructions provided in [Steps to build spark-benchmark-assembly application](build-instructions.md). For your convenience we have also provided a sample application jar file [spark-benchmark-assembly-3.3.0.jar](https://aws-bigdata-blog.s3.amazonaws.com/artifacts/oss-spark-benchmarking/spark-benchmark-assembly-3.3.0.jar) that we have built following the same steps.
+
+2\. Submit job to the EMR Serverless application created in previous step using sample CLI below.
+Make sure [runtime role](https://docs.aws.amazon.com/emr/latest/EMR-Serverless-UserGuide/security-iam-runtime-role.html) has the appropriate s3 access to read and write from your S3 buckets.
+
+```
+export APP_ID=00xxxxp6vmdyyyyy                                  #Your EMR Serverless Application Id from Previous Step 
+export RUNTIMEROLE="arn:aws:iam::333333333333:role/runtimerole" #Runtime role setup from pre-req
+export YOURBUCKET=aws-emr-xxxxxx-yyyy                           #S3 bucket to write logs and benchmark results
+export query='q1-2.4\,q2-2.4'                                   #option query param, can skip if all tpc-ds queries are run
+export AWS_REGION=us-east-1                                     #region where app was created
+export ITERATION=1                                              #number of iterations to be run
+
+aws emr-serverless start-job-run --application-id $APP_ID \
+--execution-role-arn "$RUNTIMEROLE" \
+--job-driver '{"sparkSubmit": {"entryPoint": "s3://'$YOURBUCKET'/jars/spark-benchmark-assembly-3.3.0.jar","entryPointArguments": ["s3://blogpost-sparkoneks-us-east-1/blog/BLOG_TPCDS-TEST-3T-partitioned","s3://'$YOURBUCKET'/spark/EMRSERVERLESS_TPCDS-TEST-3T-RESULT","/opt/tpcds-kit/tools","parquet","3000",'$ITERATION',"false",'q1-v2.4\,q10-v2.4\,q11-v2.4\,q12-v2.4\,q13-v2.4\,q14a-v2.4\,q14b-v2.4\,q15-v2.4\,q16-v2.4\,q17-v2.4\,q18-v2.4\,q19-v2.4\,q2-v2.4\,q20-v2.4\,q21-v2.4\,q22-v2.4\,q23a-v2.4\,q23b-v2.4\,q24a-v2.4\,q24b-v2.4\,q25-v2.4\,q26-v2.4\,q27-v2.4\,q28-v2.4\,q29-v2.4\,q3-v2.4\,q30-v2.4\,q31-v2.4\,q32-v2.4\,q33-v2.4\,q34-v2.4\,q35-v2.4\,q36-v2.4\,q37-v2.4\,q38-v2.4\,q39a-v2.4\,q39b-v2.4\,q4-v2.4\,q40-v2.4\,q41-v2.4\,q42-v2.4\,q43-v2.4\,q44-v2.4\,q45-v2.4\,q46-v2.4\,q47-v2.4\,q48-v2.4\,q49-v2.4\,q5-v2.4\,q50-v2.4\,q51-v2.4\,q52-v2.4\,q53-v2.4\,q54-v2.4\,q55-v2.4\,q56-v2.4\,q57-v2.4\,q58-v2.4\,q59-v2.4\,q6-v2.4\,q60-v2.4\,q61-v2.4\,q62-v2.4\,q63-v2.4\,q64-v2.4\,q65-v2.4\,q66-v2.4\,q67-v2.4\,q68-v2.4\,q69-v2.4\,q7-v2.4\,q70-v2.4\,q71-v2.4\,q72-v2.4\,q73-v2.4\,q74-v2.4\,q75-v2.4\,q76-v2.4\,q77-v2.4\,q78-v2.4\,q79-v2.4\,q8-v2.4\,q80-v2.4\,q81-v2.4\,q82-v2.4\,q83-v2.4\,q84-v2.4\,q85-v2.4\,q86-v2.4\,q87-v2.4\,q88-v2.4\,q89-v2.4\,q9-v2.4\,q90-v2.4\,q91-v2.4\,q92-v2.4\,q93-v2.4\,q94-v2.4\,q95-v2.4\,q96-v2.4\,q97-v2.4\,q98-v2.4\,q99-v2.4\,ss_max-v2.4',"true"],"sparkSubmitParameters": "--class com.amazonaws.eks.tpcds.BenchmarkSQL"}}' \
+--configuration-overrides '{"monitoringConfiguration": {"s3MonitoringConfiguration": {"logUri": "s3://'$YOURBUCKET'/spark/logs/"}}}' \
+--region "$AWS_REGION"
+```
+### (Optional) Submit Jobs with custom docker image:
+
+Instead of downloading benchmark utility jar file from s3, you could bake-in the benchmark jar inside your [EMR Serverless docker image](./emr-serverless-custom-images.md)
+
+3\. As an output of the benchmark job you can find the summarized results from the output bucket:
+`s3://'$YOURBUCKET'/spark/EMRSERVERLESS_TPCDS-TEST-3T-RESULT` in the same manner as we did for the OSS results and compare.
+
+## (Optional) Run an Amazon EMR Serverless job with multiple CPU architectures:
+
+The architecture of your Amazon EMR Serverless application determines the type of processors that the application uses to run the job. Amazon EMR provides two architecture options for your application: x86_64 and arm64.
+By default, when you create an EMR Serverless without specifying CPU architecture (via CLI/API), application uses x86_64 processors.
+
+If you’re evaluating migrating to Graviton2 architecture on Amazon EMR Serverless workloads, we recommend testing the Spark workloads based on your real-world use cases. If you need to run workloads across multiple processor architectures, for example test the performance for Intel and Arm CPUs, follow the walkthrough in this section to get started with some concrete ideas.
+
+### Build two EMR Serverless applications, x86 and Graviton2(ARM64):
+
+1\.  Create **Graviton2 (ARM64)** EMR application using sample CLI below (replace subnet Ids and Security groups Ids with your environment configuration) 
+
+```
+aws emr-serverless create-application --name "spark-ARM64-defaults-v1" --type SPARK --release-label emr-6.9.0 --architecture "ARM64" --region us-east-1 --initial-capacity '{
+                                          "DRIVER": {
+                                              "workerCount": 1,
+                                              "workerConfiguration": {
+                                                  "cpu": "4vCPU",
+                                                  "memory": "16GB",
+                                                  "disk": "200GB"
+                                              }
+                                          },
+                                          "EXECUTOR": {
+                                              "workerCount": 100,
+                                              "workerConfiguration": {
+                                                  "cpu": "4vCPU",
+                                                  "memory": "16GB",
+                                                  "disk": "200GB"
+                                              }
+                                          }
+}'  --network-configuration '{"subnetIds": ["subnet-XXXXX","subnet-YYYYY"], "securityGroupIds": ["sg-YYYY"]}'
+```
+
+2\. Create **x86** EMR application using sample CLI below (replace subnet Ids and Security groups Ids with your environment configuration) 
+
+```
+aws emr-serverless create-application --name "spark-x86-defaults-v1" --type SPARK --release-label emr-6.9.0 --region us-east-1  --initial-capacity '{
+                                          "DRIVER": {
+                                              "workerCount": 1,
+                                              "workerConfiguration": {
+                                                  "cpu": "4vCPU",
+                                                  "memory": "16GB",
+                                                  "disk": "200GB"
+                                              }
+                                          },
+                                          "EXECUTOR": {
+                                              "workerCount": 100,
+                                              "workerConfiguration": {
+                                                  "cpu": "4vCPU",
+                                                  "memory": "16GB",
+                                                "disk": "200GB"
+                                              }
+                                          }
+}'  --network-configuration '{"subnetIds": ["subnet-XXXXX","subnet-YYYYY"], "securityGroupIds": ["sg-YYYYYY"]}'
+```
+2\. [Build the benchmark application following the instructions provided in previous section and submit the job to both applications.](#submit-jobs-with-pre-built-benchmark-utility). 
+
+## (Optional) Isolated TPC-DS queries in loop via bash script:
+
+You can use below sample script to loop through multiple TPC-DS queries. Each query would execute in a new SparkContext each time instead of single SparkContext, this methodology helps in performance tuning, further deep dive analysis on a single query or set of queries.
+
+Take an example of testing q23a & q23b, the script helps you to run the q23a for N iterations, then loop through the next one q23b. This type of benchmark approach eliminates the impact from the pre-cached data generated by the previous queries.
+
+Download below scripts and edit RUNTIMEROLE, YOURBUCKET and other parameters as appropriate:
+[sample_loop_script.sh](scripts/sample_loop_script.sh)
+and
+[submit_tpcds.sh](scripts/submit_tpcds.sh)
+
+Run the bash script downloaded in previous step as below:
+
+```
+export APP_ID=xyyolffnjgkkg            #replace with actual EMR Serverless application id
+bash sample_loop_script.sh $APP_ID
+```
+
+Benchmark results will be available in your s3 bucket that was specified during the job submission.
+
+4\. Summarize the results from the output bucket
+`s3://'$YOURBUCKET'/spark/EMRSERVERLESS_TPCDS-TEST-3T-RESULT` in the same manner as we did for the OSS results and compare.
+
+### EMR Serverless Cleanup
+
+When you're all done, make sure to call stop-application to decommission your capacity and delete-application if you're all done.
+
+```
+aws emr-serverless stop-application \
+    --application-id $APPLICATION_ID
+```
+
+```
+aws emr-serverless delete-application \
+    --application-id $APPLICATION_ID
+
+```
+
+## Analyze Spark benchmark results using Amazon Athena
+
+### Pre-requisites:
+
+Follow [Amazon Athena workshop](https://catalog.us-east-1.prod.workshops.aws/workshops/9981f1a1-abdc-49b5-8387-cb01d238bb78/en-US/30-basics/301-create-tables) to setup Athena if you are using for the first time.
+
+### Steps:
+
+1\. Create Athena database **spark_benchmark_results** and create Athena tables on your S3 benchmark bucket path within the new database.
+
+  a\. Create Graviton2 Spark benchmark table [graviton2.sql](scripts/graviton2.sql) (point to correct S3 path in the DDL, replace $YOURBUCKET variable).
+
+  b\. Create x86 Spark benchmark table [x86.sql](scripts/x86.sql) (point to correct S3 path in the DDL, replace $YOURBUCKET variable).
+
+2\. Run spark benchmark query [benchmark.sql](scripts/benchmark.sql) and review benchmark results:
+
+3\.Shown below are sample outputs and charts:
+
+Raw Detail Output (query by CPU architecture/iterations):
+
+![Sample Output](img/C07807D6-D85F-4DE0-AD02-EC1E0D2DA8F0.jpeg)
+
+Formatted Output:
+
+![Sample Output](img/F8814632-F8EC-441B-97AE-4191F3DAE811.jpeg)
+
+Formatted Chart:
+
+![Sample Output](img/Picture1.png)
+
