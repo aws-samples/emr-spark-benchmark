@@ -24,34 +24,40 @@ git clone https://github.com/aws-samples/emr-on-eks-benchmark.git
 
 ### 2. Build a docker image of Apache Spark
 
-First change to project root directory, and then build the Spark version 3.3.0. We use Hadoop 3.3.4. Feel free to change the Spark version to the one that you need.
+First change to project root directory, and then build the Spark base image. In this example, we use Spark version 3.3.0 and Hadoop 3.3.4. Feel free to change these versions if needed.
 ```
 cd emr-on-eks-benchmark
-docker build -t spark:3.3.0_hadoop_3.3.4 -f docker/hadoop-aws-3.3.1/Dockerfile --build-arg HADOOP_VERSION=3.3.4 --build-arg SPARK_VERSION=3.3.0 .
+
+export SPARK_VERSION=3.3.0
+export HADOOP_VERSION=3.3.4
+```
+
+```
+docker build -t spark:$SPARK_VERSION_hadoop_$HADOOP_VERSION -f docker/hadoop-aws-3.3.1/Dockerfile --build-arg HADOOP_VERSION=$HADOOP_VERSION --build-arg SPARK_VERSION=$SPARK_VERSION .
 ```
 
 ### 3. Build the Spark Benchmark application as a docker image
 
-Build the benchmark utility based on the Spark version we created above. In order to do that we need to make sure the Dockerfile points to the correct Spark and Hadoop versions. Edit [docker/benchmark-util/Dockerfile](https://github.com/aws-samples/emr-on-eks-benchmark/blob/main/docker/benchmark-util/Dockerfile) and make sure Spark and Hadoop versions are correct. In our example we are benchmarking Spark version 3.3.0.
+Build the benchmark utility image based on the Spark based image built above. In order to do that, we need to make sure the following build argument contains the `SPARK_BASE_IMAGE` parameter:
 
 ```
-ARG SPARK_VERSION=3.3.0
-ARG HADOOP_VERSION=3.3.4
+--build-arg SPARK_BASE_IMAGE=spark:$SPARK_VERSION_hadoop_$HADOOP_VERSION
 ```
 
-Use this Dockerfile to build the benchmark utility as shown below
+
+Use Dockerfile to compile the benchmark utility as shown below:
 
 ```
-docker build -t eks-spark-benchmark:3.3.0 -f docker/benchmark-util/Dockerfile --build-arg SPARK_BASE_IMAGE=spark:3.3.0_hadoop_3.3.4 .
+docker build -t eks-spark-benchmark:$SPARK_VERSION -f docker/benchmark-util/Dockerfile --build-arg SPARK_BASE_IMAGE=spark:$SPARK_VERSION_hadoop_$HADOOP_VERSION .
 ```
 
-### 4. Copy the benchmark application jar file from the docker image
-To do this open two terminals. In the first terminal run a docker container from the image built in the previous step. In the example below we give it a name `spark-benchmark` using the `--name` argument.
+### 4. Locate the benchmark application jar file within a docker image
+Run a docker container from the image built in the previous step. In the example below we give it a name `spark-benchmark` using the `--name` argument.
 
 ```
-docker run --name spark-benchmark -it eks-spark-benchmark:3.3.0 bash
+docker run --name spark-benchmark -it eks-spark-benchmark:$SPARK_VERSION bash
 ```
-This should start a bash prompt in your spark-benchmark docker container. If the build was successful, inside the bash prompt in your docker container, you should see a jar file named `eks-spark-benchmark-assembly-1.0.jar` in the `$SPARK_HOME/examples/jars` directory as shown in the example below:
+This should start an interactive session to your spark-benchmark docker container. If the login was successful, you should be able to run bash scripts as usual. You should see a jar file named `eks-spark-benchmark-assembly-1.0.jar` under the `$SPARK_HOME/examples/jars` directory as shown in the example below:
 
 ```
 hadoop@9ca5b2afe778:/opt/spark/work-dir$ pwd
@@ -59,9 +65,12 @@ hadoop@9ca5b2afe778:/opt/spark/work-dir$ pwd
 hadoop@9ca5b2afe778:/opt/spark/work-dir$ cd ../examples/jars
 hadoop@9ca5b2afe778:/opt/spark/examples/jars$ ls
 eks-spark-benchmark-assembly-1.0.jar  scopt_2.12-3.7.1.jar  spark-examples_2.12-3.3.0.jar
+# optionally, directly upload the benchmark-assembly jar file to S3 bucket within the docker container if you are testing EMR's Spark.
 ```
 
-On another terminal in Cloud9 running the `docker ps` command shows our running container. Here is an example:
+### 5. Copy the jar and upload to S3
+
+On a second terminal of Cloud9 or your local computer, run the `docker ps` command to find your running container and its name. Here is an example:
 
 ```
 sekar:~/environment $ docker ps
@@ -69,14 +78,18 @@ CONTAINER ID   IMAGE                       COMMAND                  CREATED     
 9ca5b2afe778   eks-spark-benchmark:3.3.0   "/opt/entrypoint.sh …"   7 seconds ago   Up 6 seconds             spark-benchmark
 ```
 
-Now you can copy the eks-spark-benchmark-assembly-1.0.jar file from the docker container into your local directory using `docker cp` command as shown below:
+Now you can copy the compiled benchmark utility file from the running container to a local host via the syntax `docker cp <container_name>:/path/to/example.txt ./path/to/localhost`. 
+
+For example:
 
 ```
 docker cp spark-benchmark:/opt/spark/examples/jars/eks-spark-benchmark-assembly-1.0.jar ./spark-benchmark-assembly-3.3.0.jar
+
 ```
-
-Optionally, upload benchmark application to S3. Replace `$YOUR_S3_BUCKET` with your S3 bucket name.
-
+To test EMR Spark runtime, upload the benchmark application to S3. Replace $YOUR_S3_BUCKET with your S3 bucket name. To test open-source Apache Spark, you must download the file to your local host.
 ```
 aws s3 cp spark-benchmark-assembly-3.3.0.jar s3://$YOUR_S3_BUCKET/blog/jar/spark-benchmark-assembly-3.3.0.jar
+
 ```
+
+
