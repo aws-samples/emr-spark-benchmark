@@ -8,6 +8,7 @@ This repository provides a general tool to benchmark Spark performance on EC2 an
   - b. **(Optional)** [Isolated TPC-DS queries in loop via bash script for EMR Serverless](#optional-isolated-tpc-ds-queries-in-loop-via-bash-script)
   - c. **(Optional)** [Analyze Spark benchmark results using Amazon Athena.](#analyze-spark-benchmark-results-using-amazon-athena)
 4. [Benchmark EMR on EKS using the EMR Spark Runtime](https://github.com/aws-samples/emr-on-eks-benchmark#run-benchmark)
+  - a. For Iceberg read and write Benchmarks, see [Iceberg DQL benchmarking]https://github.com/aws-samples/emr-on-eks-benchmark/tree/tpcds-v2.13_iceberg?tab=readme-ov-file#benchmark-for-emr-on-ec2-with-spark--iceberg and [Iceberg DML benchmarking]https://github.com/aws-samples/emr-on-eks-benchmark/tree/tpcds-v2.13_iceberg?tab=readme-ov-file#benchmark-for-emr-on-ec2-with-spark--iceberg-for-writes
 
 ## Steps to setup OSS Spark Benchmarking
 
