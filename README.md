@@ -70,7 +70,6 @@ pip3 install flintrock
 flintrock --version
 ```
 
-
 2\. Run the command `flintrock configure`, which will pop up a default
 configuration file. Then modify the default config.yaml file based on
 your need. In the following example, replace `<YOUR_KEY_PAIR_NAME>` with
